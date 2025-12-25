@@ -1,0 +1,369 @@
+/* Visual Novel UI Styles - Hybrid Version */
+.dialogue-box {
+  position: relative;
+  background: #000;
+  border: 4px solid #fff;
+  border-radius: 0; /* Pixel art style usually sharp corners */
+  padding: 0;
+  box-shadow: 0 0 0 4px #000, 0 0 0 8px #fff; /* Double border effect */
+  margin-top: auto;
+  display: flex;
+  min-height: 300px; /* Increased height */
+  max-height: 350px; /* Increased max height */
+  font-family: 'Courier New', monospace;
+  width: 100%; /* Ensure it takes full width of container */
+  box-sizing: border-box; /* Include padding/border in width */
+}
+
+.dialogue-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  z-index: 20;
+}
+
+.dialogue-corner-tl { top: -4px; left: -4px; }
+.dialogue-corner-tr { top: -4px; right: -4px; }
+.dialogue-corner-bl { bottom: -4px; left: -4px; }
+.dialogue-corner-br { bottom: -4px; right: -4px; }
+
+/* Character Portrait Area */
+.character-portrait-area {
+  width: 200px;
+  min-width: 200px;
+  background: #111;
+  border-right: 4px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.character-portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.character-portrait-placeholder {
+  font-size: 6rem;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+/* Dialogue Content Area */
+.dialogue-content-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Critical for flex child to shrink properly with text overflow */
+}
+
+.character-badge {
+  position: absolute;
+  top: -28px; /* Adjusted for larger size */
+  left: 20px;
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 20px; /* Increased padding */
+  font-size: 1.5rem; /* Increased font size */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 2px solid #fff;
+  z-index: 10;
+}
+
+.dialogue-text {
+  color: #fff;
+  font-size: 2rem; /* Increased font size */
+  line-height: 1.6;
+  padding: 40px 32px 24px 32px; /* Increased padding */
+  flex: 1;
+  overflow-y: auto;
+}
+
+.typing-cursor {
+  animation: blink 0.7s step-end infinite;
+  color: #fff;
+}
+
+/* Scene Display */
+.scene-display {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  /* margin-bottom: 24px; Removed margin for split layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid rgba(234, 179, 8, 0.3);
+  min-height: 400px;
+}
+
+.scene-parking-lot {
+  background: linear-gradient(to bottom, #1e3a8a, #312e81);
+}
+
+.scene-car-interior {
+  background: linear-gradient(to bottom, #374151, #1f2937);
+}
+
+.scene-gate {
+  background: linear-gradient(to bottom, #7f1d1d, #991b1b);
+}
+
+.character-sprite {
+  font-size: 16rem;
+  animation: bounce-slow 3s ease-in-out infinite;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.9));
+}
+
+.scanline-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.1;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    white 2px,
+    white 4px
+  );
+}
+
+/* Choice Buttons - Hybrid (Mouse + Keyboard) */
+.choice-container {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.choice-button {
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  color: white;
+  font-weight: bold;
+  padding: 14px 24px;
+  border-radius: 8px;
+  border: 4px solid #60a5fa;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.choice-button:hover:not(:disabled) {
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  transform: scale(1.05);
+  border-color: #93c5fd;
+}
+
+.choice-button:disabled {
+  background: linear-gradient(to right, #4b5563, #374151);
+  cursor: not-allowed;
+  opacity: 0.5;
+  border-color: #6b7280;
+}
+
+.choice-hotkey {
+  display: inline-block;
+  background: #facc15;
+  color: #000;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-right: 16px;
+  box-shadow: 0 2px 8px rgba(250, 204, 21, 0.4);
+}
+
+.choice-arrow {
+  font-size: 1.5rem;
+  margin-left: 12px;
+}
+
+/* QTE Overlay */
+.qte-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+.qte-container {
+  background: #7f1d1d;
+  border: 5px solid #ef4444;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.qte-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 32px;
+  animation: pulse 1s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+}
+
+.qte-sequence {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.qte-key {
+  font-size: 4rem;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 5px solid;
+  transition: all 0.2s;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.qte-key-pending {
+  background: #374151;
+  border-color: #6b7280;
+  opacity: 0.6;
+}
+
+.qte-key-active {
+  background: #eab308;
+  border-color: #fbbf24;
+  animation: bounce 0.6s ease-in-out infinite;
+  transform: scale(1.15);
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.8);
+}
+
+.qte-key-complete {
+  background: #16a34a;
+  border-color: #22c55e;
+  transform: scale(0.9);
+  opacity: 0.5;
+}
+
+.qte-progress {
+  color: white;
+  font-size: 1.5rem;
+  font-family: 'Courier New', monospace;
+  margin-top: 16px;
+}
+
+/* Main Layout */
+.game-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.game-panel-left {
+  width: 70%;
+  height: 100%;
+  border-right: 6px solid #22d3ee;
+  background: linear-gradient(to bottom right, #1e1b4b, #4c1d95, #7e22ce);
+  box-shadow: 4px 0 20px rgba(34, 211, 238, 0.3);
+}
+
+.game-panel-right {
+  width: 30%;
+  height: 100%;
+  background: #111827;
+}
+
+.visual-novel-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  gap: 20px;
+}
+
+/* Meme Ending Animations */
+@keyframes spin-implode-fade {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  60% {
+    /* 前 60% 的時間還看得到 */
+    opacity: 1; 
+  }
+  100% {
+    /* 最後變成透明且縮到最小 */
+    transform: rotate(7200deg) scale(0);
+    opacity: 0; 
+  }
+}
+
+.spin-implode {
+  animation: spin-implode-fade 7s ease-in-out forwards;
+}
+
+@keyframes dance-shake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-5px, 5px) rotate(-1deg); }
+  50% { transform: translate(5px, -5px) rotate(1deg); }
+  75% { transform: translate(-5px, -5px) rotate(-1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.dance-shake {
+  animation: dance-shake 0.5s infinite; /* 無限循環直到切換場景 */
+}
+
+@keyframes crazy-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.3); }
+  50% { transform: rotate(180deg) scale(0.7); }
+  75% { transform: rotate(270deg) scale(1.3); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.crazy-spin {
+  position: absolute;
+  animation: crazy-spin 1s linear infinite;
+}
+
+@keyframes super-chaos-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.2); }
+  50% { transform: rotate(180deg) scale(0.8); }
+  75% { transform: rotate(270deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.super-chaos-spin {
+  position: absolute;
+  animation-name: super-chaos-spin;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+

@@ -1,0 +1,249 @@
+/* 文字遊戲網格樣式 */
+
+.grid-game-container {
+  width: 100%;
+  max-width: 900px;
+  background: rgba(10, 14, 39, 0.95);
+  border: 3px solid #667eea;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.game-title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00ff00;
+}
+
+.game-title h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 255, 0, 0.5);
+}
+
+.game-status {
+  font-size: 1.1rem;
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.status-text {
+  color: #ffff00;
+  background: rgba(255, 255, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.durability {
+  color: #ff00ff;
+  font-size: 1.2rem;
+}
+
+/* 網格世界 */
+.grid-world {
+  display: inline-block;
+  background: #000000;
+  border: 4px solid #00ff00;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 
+    inset 0 0 20px rgba(0, 255, 0, 0.3),
+    0 0 30px rgba(0, 255, 0, 0.2);
+  font-family: 'MS Gothic', 'SimHei', monospace;
+  line-height: 1;
+}
+
+.grid-row {
+  display: flex;
+  height: 32px;
+}
+
+.grid-cell {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  border: 1px solid rgba(0, 255, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* 牆壁 */
+.grid-cell.wall {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #7f8c8d;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-color: #34495e;
+}
+
+/* 玩家 */
+.grid-cell.player {
+  background: radial-gradient(circle, rgba(255, 0, 255, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+  color: #ff00ff;
+  text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  animation: pulse 1s infinite;
+}
+
+/* 車輛 */
+.grid-cell.car {
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  animation: glow 2s infinite;
+}
+
+/* 柵欄 - 關閉 */
+.grid-cell.barrier-closed {
+  background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+  color: #ff0000;
+  text-shadow: 0 0 10px #ff0000;
+  animation: blink 1.5s infinite;
+}
+
+/* 柵欄 - 開啟 */
+.grid-cell.barrier-open {
+  background: radial-gradient(circle, rgba(0, 255, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+  color: #00ff00;
+  text-shadow: 0 0 10px #00ff00;
+  animation: rotate 2s infinite;
+}
+
+/* 停車位 */
+.grid-cell.parking {
+  background: rgba(255, 255, 0, 0.1);
+  color: #ffff00;
+  opacity: 0.6;
+}
+
+/* 感測器 */
+.grid-cell.sensor {
+  background: radial-gradient(circle, rgba(255, 165, 0, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%);
+  color: #ffa500;
+  text-shadow: 0 0 8px #ffa500;
+  animation: scan 3s infinite;
+}
+
+/* 動畫效果 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes glow {
+  0%, 100% { 
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  }
+  50% { 
+    text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes scan {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* 控制提示 */
+.control-hints {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(102, 126, 234, 0.2);
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  color: #00ffff;
+  font-size: 0.95rem;
+}
+
+.hint-section {
+  margin: 8px 0;
+  line-height: 1.8;
+}
+
+.hint-section strong {
+  color: #ffff00;
+}
+
+.legend-item {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 5px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.legend-item.wall {
+  background: #34495e;
+  color: #7f8c8d;
+}
+
+.legend-item.player {
+  background: rgba(255, 0, 255, 0.3);
+  color: #ff00ff;
+}
+
+.legend-item.car {
+  background: rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+}
+
+.legend-item.barrier-closed {
+  background: rgba(255, 0, 0, 0.3);
+  color: #ff0000;
+}
+
+.legend-item.barrier-open {
+  background: rgba(0, 255, 0, 0.3);
+  color: #00ff00;
+}
+
+.legend-item.parking {
+  background: rgba(255, 255, 0, 0.2);
+  color: #ffff00;
+}
+
+/* 距離指示器 */
+.distance-indicator {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #00ff00;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.indicator-label {
+  font-size: 1.1rem;
+  color: #00ff00;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.indicator-value {
+  font-size: 2rem;
+  color: #00ffff;
+  font-weight: bold;
+  text-shadow: 0 0 15px #00ffff;
+  font-family: 'Courier New', monospace;
+}
+
+.indicator-alert {
+  margin-top: 10px;
+  color: #ff0000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  animation: blink 0.8s infinite;
+}

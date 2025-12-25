@@ -1,0 +1,248 @@
+/* IoT Debug Panel Styles */
+.iot-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #111827;
+  padding: 24px;
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+}
+
+.iot-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid #22d3ee;
+}
+
+.iot-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #22d3ee;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+}
+
+.iot-subtitle {
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+.status-panel {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #1f2937;
+  border-radius: 10px;
+  border: 3px solid #374151;
+}
+
+.status-title {
+  font-size: 1.375rem;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+.status-icon {
+  margin-right: 10px;
+  font-size: 1.25rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.status-label {
+  color: #9ca3af;
+  font-size: 1.125rem;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.status-badge-idle { background: #6b7280; }
+.status-badge-inCar { background: #3b82f6; }
+.status-badge-qteSequence { background: #eab308; }
+.status-badge-engineStall { background: #ef4444; }
+.status-badge-driving { background: #22c55e; }
+.status-badge-atGate { background: #f97316; }
+.status-badge-gateOpening { background: #a855f7; }
+.status-badge-parked { background: #10b981; }
+.status-badge-outsideCar { background: #6366f1; }
+.status-badge-inputEmail { background: #ec4899; }
+.status-badge-ntpSync { background: #06b6d4; }
+.status-badge-paymentInfo { background: #f43f5e; }
+.status-badge-paymentSuccess { background: #8b5cf6; }
+
+.status-value {
+  color: #22c55e;
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.sensor-panel {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #1f2937;
+  border-radius: 10px;
+  border: 3px solid #374151;
+}
+
+.sensor-title {
+  font-size: 1.375rem;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+.sensor-distance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.distance-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #22d3ee;
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.7);
+}
+
+.progress-bar-container {
+  width: 100%;
+  background: #374151;
+  border-radius: 9999px;
+  height: 32px;
+  overflow: hidden;
+  border: 3px solid #4b5563;
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.progress-green { background: #22c55e; }
+.progress-yellow { background: #eab308; }
+.progress-orange { background: #f97316; }
+.progress-red { background: #ef4444; }
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.logs-panel {
+  flex: 1;
+  padding: 20px;
+  background: #000;
+  border-radius: 10px;
+  border: 3px solid #22c55e;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.logs-title {
+  font-size: 1.375rem;
+  font-weight: bold;
+  color: #22c55e;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.logs-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.logs-empty {
+  text-align: center;
+  color: #4b5563;
+  padding: 32px 0;
+}
+
+.log-entry {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-bottom: 4px;
+}
+
+.log-entry:hover {
+  background: #111827;
+}
+
+.log-timestamp {
+  color: #6b7280;
+  margin-right: 8px;
+}
+
+.log-text-system { color: #22d3ee; }
+.log-text-mqtt { color: #22c55e; }
+.log-text-coap { color: #3b82f6; }
+.log-text-sensor { color: #eab308; }
+.log-text-qte { color: #a855f7; }
+.log-text-action { color: #f97316; }
+.log-text-success { color: #10b981; }
+.log-text-fail { color: #ef4444; }
+.log-text-narrative { color: #ec4899; }
+.log-text-sql { color: #6366f1; }
+.log-text-ntp { color: #06b6d4; font-weight: bold; }
+.log-text-smtp { color: #f43f5e; font-weight: bold; }
+
+.panel-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 3px solid #374151;
+  font-size: 0.95rem;
+  color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Custom Scrollbar for Logs */
+.logs-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-content::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.logs-content::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 4px;
+}
+
+.logs-content::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}

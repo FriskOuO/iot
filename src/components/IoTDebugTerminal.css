@@ -1,0 +1,294 @@
+/* IoT Debug Terminal 樣式 */
+
+.iot-debug-terminal {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  max-height: calc(100vh - 120px);
+  background: rgba(0, 0, 0, 0.95);
+  border: 3px solid #00ff00;
+  border-radius: 10px;
+  padding: 15px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  color: #00ff00;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 0, 0.5),
+    inset 0 0 30px rgba(0, 255, 0, 0.1);
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #00ff00;
+}
+
+.terminal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.terminal-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00ff00;
+  font-size: 0.9rem;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+.status-dot.connected {
+  background: #00ff00;
+  box-shadow: 0 0 10px #00ff00;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* 終端區塊 */
+.terminal-section {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 8px;
+}
+
+.terminal-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: #ffff00;
+  text-shadow: 0 0 8px #ffff00;
+}
+
+/* HTTPS 面板 */
+.https-panel {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.https-step {
+  padding: 6px 0;
+  color: #00ffff;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* NTP 面板 */
+.ntp-panel {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.ntp-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.ntp-row:last-child {
+  border-bottom: none;
+}
+
+.ntp-label {
+  color: #ffff00;
+  font-weight: bold;
+}
+
+.ntp-value {
+  color: #00ff00;
+}
+
+/* SQL 表格 */
+.sql-table {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sql-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sql-table th {
+  background: rgba(102, 126, 234, 0.3);
+  color: #ffff00;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.85rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.sql-table td {
+  padding: 8px 10px;
+  color: #00ff00;
+  font-size: 0.8rem;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.sql-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sql-table tr:hover {
+  background: rgba(0, 255, 0, 0.1);
+}
+
+/* 日誌流 */
+.log-stream {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px;
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.log-stream::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log-stream::-webkit-scrollbar-track {
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 4px;
+}
+
+.log-stream::-webkit-scrollbar-thumb {
+  background: #00ff00;
+  border-radius: 4px;
+}
+
+.log-empty {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-style: italic;
+}
+
+.log-entry {
+  padding: 8px;
+  margin-bottom: 6px;
+  border-left: 3px solid #00ff00;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  transition: background 0.2s;
+}
+
+.log-entry:hover {
+  background: rgba(0, 255, 0, 0.15);
+}
+
+.log-entry.log-mqtt {
+  border-left-color: #00ffff;
+}
+
+.log-entry.log-coap {
+  border-left-color: #ff00ff;
+}
+
+.log-entry.log-ntp {
+  border-left-color: #ffff00;
+}
+
+.log-entry.log-smtp {
+  border-left-color: #ff6600;
+}
+
+.log-icon {
+  font-size: 1rem;
+}
+
+.log-timestamp {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.log-type {
+  color: #ffff00;
+  font-weight: bold;
+  padding: 2px 6px;
+  background: rgba(255, 255, 0, 0.2);
+  border-radius: 3px;
+}
+
+.log-message {
+  color: #00ff00;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* 感測器面板 */
+.sensor-panel {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.sensor-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.sensor-row:last-child {
+  border-bottom: none;
+}
+
+.sensor-label {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.sensor-value {
+  color: #00ff00;
+  font-size: 1.1rem;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+/* SMTP 按鈕 */
+.smtp-button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid #00ff00;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: 'Courier New', monospace;
+}
+
+.smtp-button:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.smtp-button:active {
+  transform: translateY(0);
+}
