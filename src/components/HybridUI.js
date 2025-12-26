@@ -17,6 +17,7 @@ const spaghettiVideo = "/assets/SPAGHETTI_DANCE.mp4";
 const spaghettiOiiaSound = "/assets/SPAGETTI_OIIA.mp3";
 const railingClosedImg = "/assets/railing.png";
 const railingOpenImg = "/assets/railing_opening.png";
+const teachImg = "/assets/teach.png";
 
 /**
  * Live Variable Renderer
@@ -186,7 +187,7 @@ export const RetroDialogueBox = ({ text, characterName, actor, onComplete, chara
 /**
  * Scene Display Component
  */
-export const SceneDisplay = ({ background, character, gameState }) => {
+export const SceneDisplay = ({ background, character, gameState, onTutorialComplete }) => {
   const backgroundClass = `scene-display scene-${background}`;
   const spaghettiVideoRef = useRef(null);
   const [chaosElements, setChaosElements] = useState([]);
@@ -307,6 +308,9 @@ export const SceneDisplay = ({ background, character, gameState }) => {
       case 'engineStall':
         return carImg; // Interior view
 
+      case 'tutorialIntro':
+        return teachImg;
+
       case 'intro1':
       case 'intro2':
       case 'intro3':
@@ -325,7 +329,7 @@ export const SceneDisplay = ({ background, character, gameState }) => {
   };
 
   return (
-    <div className={backgroundClass} style={{ position: 'relative', overflow: 'hidden' }}>
+    <div className={backgroundClass} style={{ position: 'relative', overflow: 'hidden', width: '100%', height: '100%' }}>
       {/* Chaos Background Layer */}
       {gameState === 'endingRemix' && chaosElements.map(el => (
         <img
@@ -364,17 +368,28 @@ export const SceneDisplay = ({ background, character, gameState }) => {
             }}
           />
         ) : (
-          <img 
-            src={getSceneImage()} 
-            alt="Main Scene"
-            className={getAnimationClass()}
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'contain',
-              maxWidth: '800px' // Prevent it from getting absurdly wide on large screens
-            }}
-          />
+          <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <img 
+              src={getSceneImage()} 
+              alt="Main Scene"
+              className={getAnimationClass()}
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain',
+                maxWidth: '800px',
+                zIndex: 1
+              }}
+            />
+            {gameState === 'tutorialIntro' && (
+                <div 
+                    className="absolute inset-0 z-50 flex items-center justify-center cursor-pointer"
+                    onClick={onTutorialComplete}
+                >
+                    {/* Invisible click layer to ensure progression if image doesn't cover everything */}
+                </div>
+            )}
+          </div>
         )}
       </div>
       

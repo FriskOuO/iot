@@ -269,7 +269,19 @@ export const parkingGameMachine = setup({
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (3/3)' } }
       ],
-      on: { NEXT: 'inCar' }
+      on: { NEXT: 'tutorialIntro' }
+    },
+
+    tutorialIntro: {
+      entry: [
+        { type: 'updateState', params: 'tutorialIntro' },
+        { type: 'updateCurrentText', params: '[SYSTEM]: 生物特徵掃描完成...\n[CAR AI]: 警告：資料庫中未找到您的駕駛執照紀錄。\n[CAR AI]: 根據安全協議，強制啟動「新手引導模式」。\n[CAR AI]: 系統偵測到外部輸入裝置。請參閱上方圖示熟悉操作配置。\n[CAR AI]: 確認完畢後，請點擊畫面解除安全鎖定。' },
+        { type: 'updateScene', params: { background: 'car-interior', character: 'system' } },
+        { type: 'addLog', params: { type: 'system', text: '🔰 啟動新手引導' } }
+      ],
+      on: {
+        NEXT: 'inCar'
+      }
     },
 
     inCar: {

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useMachine } from '@xstate/react';
 import './components/CyberpunkUI.css'; // New Cyberpunk Styles
 import './components/StoryMode.css'; // Story Mode Styles
@@ -10,7 +10,7 @@ import ManualDrivingConsole from './components/ManualDrivingConsole';
 import { useDrivingMechanic } from './hooks/useDrivingMechanic';
 
 // Helper for typing effect with variable replacement
-const TypewriterText = ({ text, context, onComplete, forceShowFull, isDrivingActive }) => {
+const TypewriterText = ({ text, context, onComplete, forceShowFull, isDrivingActive, onUpdate }) => {
   const [displayed, setDisplayed] = useState('');
   const [processedText, setProcessedText] = useState('');
   
@@ -36,6 +36,7 @@ const TypewriterText = ({ text, context, onComplete, forceShowFull, isDrivingAct
     if (forceShowFull || isDrivingActive) {
       setDisplayed(processedText);
       if (onComplete) onComplete();
+      if (onUpdate) onUpdate();
       return;
     }
 
@@ -47,6 +48,7 @@ const TypewriterText = ({ text, context, onComplete, forceShowFull, isDrivingAct
       if (index < processedText.length) {
         index++;
         setDisplayed(processedText.slice(0, index));
+        if (onUpdate) onUpdate();
       } else {
         clearInterval(timer);
         if (onComplete) onComplete();
@@ -66,7 +68,12 @@ function App() {
   const [forceShowFull, setForceShowFull] = useState(false);
   const [email, setEmail] = useState('');
   const [drivingDistance, setDrivingDistance] = useState(500); // Lifted state for driving
-  
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const currentState = state.value;
   const context = state.context;
 
@@ -136,6 +143,7 @@ function App() {
       case 'introStory1':
       case 'introStory2':
       case 'introStory3':
+      case 'tutorialIntro':
         return [{ label: '繼續', action: 'NEXT' }];
       case 'intro2': return [{ label: '發生什麼事了？', action: 'NEXT' }];
       case 'intro3': return [{ label: '四處看看', action: 'NEXT' }];
@@ -227,6 +235,7 @@ function App() {
             background={context.backgroundImage}
             character={context.characterImage}
             gameState={currentState}
+            onTutorialComplete={() => send({ type: 'NEXT' })}
           />
           <div className="scene-overlay"></div>
         </div>
@@ -262,6 +271,7 @@ function App() {
                         onComplete={() => setTypingComplete(true)}
                         forceShowFull={forceShowFull}
                         isDrivingActive={isDrivingActive}
+                        onUpdate={scrollToBottom}
                       />
                     )}
                   </div>
@@ -279,6 +289,7 @@ function App() {
                         onComplete={() => setTypingComplete(true)}
                         forceShowFull={forceShowFull}
                         isDrivingActive={isDrivingActive}
+                        onUpdate={scrollToBottom}
                       />
                     )}
                 </div>
@@ -302,6 +313,9 @@ function App() {
                 <span className="text-yellow-400 animate-bounce" style={{ color: 'var(--accent-warning)', fontSize: '1.5rem', animation: 'bounce 1s infinite' }}>▼</span>
               </div>
             )}
+            
+            {/* Auto-scroll Anchor */}
+            <div ref={messagesEndRef} />
             
             {/* QTE Display */}
             {currentState === 'qteSequence' && (
