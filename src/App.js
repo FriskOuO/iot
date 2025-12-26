@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useMachine } from '@xstate/react';
 import './components/CyberpunkUI.css'; // New Cyberpunk Styles
+import './components/StoryMode.css'; // Story Mode Styles
 import { parkingGameMachine } from './gameMachine';
 import { SceneDisplay } from './components/HybridUI'; // Reuse SceneDisplay for now
 import CyberpunkDashboard from './components/CyberpunkDashboard';
@@ -131,7 +132,11 @@ function App() {
   // Get available choices
   const getChoices = () => {
     switch (currentState) {
-      case 'intro1': return [{ label: '繼續', action: 'NEXT' }];
+      case 'intro1': 
+      case 'introStory1':
+      case 'introStory2':
+      case 'introStory3':
+        return [{ label: '繼續', action: 'NEXT' }];
       case 'intro2': return [{ label: '發生什麼事了？', action: 'NEXT' }];
       case 'intro3': return [{ label: '四處看看', action: 'NEXT' }];
       case 'intro4': return [{ label: '走向車輛', action: 'NEXT' }];
@@ -139,7 +144,7 @@ function App() {
       case 'engineStall': return [{ label: '再試一次', action: 'RETRY' }];
       case 'atGate': return []; // Auto-advance, no button needed
       case 'gateOpening': return [{ label: '停車', action: 'PARK' }];
-      case 'parked': return [{ label: '下車', action: 'EXIT_CAR' }, { label: '重新開始', action: 'RESTART' }];
+      case 'parked': return [{ label: '下車', action: 'EXIT_CAR' }];
       case 'postDriveChoice': 
         if (context.isTimeSkipped) {
           return [{ label: '前往繳費', action: 'GO_PAY' }];
@@ -168,11 +173,13 @@ function App() {
         return [{ label: '回到停車場', action: 'BACK' }];
       case 'mysteriousEvent':
         return [{ label: '前往繳費', action: 'GO_PAY' }];
+      case 'transitionToPayment':
+        return [{ label: '前往繳費選項', action: 'NEXT' }];
       case 'endingBlackhole':
       case 'endingDance':
       case 'endingRemix':
         return []; // Auto-transition
-      case 'outsideCar': return [{ label: '繳費', action: 'PAY' }, { label: '重新開始', action: 'RESTART' }];
+      case 'outsideCar': return [{ label: '繳費', action: 'PAY' }];
       case 'paymentInfo': return [{ label: '確認付款', action: 'CONFIRM_PAY' }];
       case 'paymentSuccess': return [{ label: '結束遊戲', action: 'RESTART' }];
       default: return [];
@@ -181,6 +188,20 @@ function App() {
 
   const choices = getChoices();
   const isGenericContinue = choices.length === 1 && choices[0].label === '繼續';
+
+  // Comprehensive Reset Function
+  const handleRestart = () => {
+    // 1. Reset Local Driving State
+    setDrivingDistance(500);
+    
+    // 2. Reset UI State
+    setEmail('');
+    setTypingComplete(false);
+    setForceShowFull(false);
+
+    // 3. Reset Game Machine State (includes inventory, counters, etc.)
+    send({ type: 'RESTART' });
+  };
 
   const handleTerminalClick = () => {
     // Prevent interaction during driving to avoid accidental text skipping
@@ -221,8 +242,8 @@ function App() {
             </div>
           </div>
 
-          <div className="dialogue-text" style={{ whiteSpace: 'pre-wrap', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {/* Render text lines separately if they contain newlines */}
+          <div className="dialogue-text" style={{ whiteSpace: 'pre-wrap', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
+            {/* Standard Unified Rendering for ALL Narrative States */}
             {context.currentText.split('\n\n').map((line, idx) => {
               // Check if line starts with a speaker tag like [SYSTEM]: or [PROTAGONIST]:
               const match = line.match(/^(\[[^\]]+\]):\s*(.*)/);
@@ -249,7 +270,7 @@ function App() {
               // Fallback for lines without speaker tags or special cases
               return (
                 <div key={idx}>
-                   {currentState === 'driving' ? (
+                    {currentState === 'driving' ? (
                       <span>{line}</span>
                     ) : (
                       <TypewriterText 
@@ -275,8 +296,12 @@ function App() {
               </div>
             )}
             
-            {/* Next Indicator */}
-            {isGenericContinue && typingComplete && <div className="next-indicator"></div>}
+            {/* Next Indicator (Unified) */}
+            {isGenericContinue && typingComplete && (
+              <div className="story-controls" style={{ marginTop: 'auto' }}>
+                <span className="text-yellow-400 animate-bounce" style={{ color: 'var(--accent-warning)', fontSize: '1.5rem', animation: 'bounce 1s infinite' }}>▼</span>
+              </div>
+            )}
             
             {/* QTE Display */}
             {currentState === 'qteSequence' && (
@@ -338,7 +363,11 @@ function App() {
                     className="holo-btn"
                     onClick={(e) => {
                       e.stopPropagation();
-                      send({ type: choice.action });
+                      if (choice.action === 'RESTART') {
+                        handleRestart();
+                      } else {
+                        send({ type: choice.action });
+                      }
                     }}
                     disabled={!typingComplete && currentState !== 'engineStall'}
                   >
@@ -359,7 +388,7 @@ function App() {
       />
 
       {/* Virtual Mobile Overlay */}
-      <VirtualMobile notification={context.notification} />
+      <VirtualMobile notification={context.notification} parkedHours={context.parkedHours} />
     </div>
   );
 }

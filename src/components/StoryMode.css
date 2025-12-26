@@ -1,0 +1,55 @@
+
+/* Story Mode Text Container */
+.story-text-container {
+  flex: 1;           /* 佔據剩餘空間 */
+  overflow-y: auto;  /* 如果真的字太多，寧願讓它捲動也不要縮小 */
+  font-size: 1.1rem; /* 強制固定大小 */
+  line-height: 1.6;  /* 增加行高，比較好閱讀 */
+  white-space: pre-wrap; /* 保留換行 */
+  padding-right: 10px; /* 避免捲軸遮住文字 */
+  color: var(--text-main);
+  /* font-family: var(--font-mono); Removed to match standard dialogue font */
+}
+
+/* Custom Scrollbar for Story Text */
+.story-text-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.story-text-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.story-text-container::-webkit-scrollbar-thumb {
+  background: var(--accent-secondary);
+  border-radius: 3px;
+}
+
+.story-controls {
+  display: flex;
+  justify-content: flex-end; /* 靠右對齊 */
+  align-items: flex-end;     /* 靠下對齊 */
+  padding-top: 10px;         /* 跟文字保持距離 */
+  min-height: 40px;          /* 預留高度給按鈕 */
+}
+
+.next-triangle {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--accent-warning);
+  animation: bounce 1s infinite; /* Match standard bounce animation */
+  padding: 5px 10px;
+  transition: transform 0.2s;
+  user-select: none;
+  line-height: 1;
+}
+
+.next-triangle:hover {
+  transform: scale(1.2);
+  color: var(--accent-primary);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(5px); opacity: 0.7; }
+}

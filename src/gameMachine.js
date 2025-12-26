@@ -120,7 +120,10 @@ export const parkingGameMachine = setup({
       userEmail: '',
       hasSpaghetti: false,
       boundaryVisits: 0,
-      isTimeSkipped: false
+      isTimeSkipped: false,
+      parkedHours: 0,
+      parkingFee: 0,
+      lastEnding: null
     })),
 
     pickUpSpaghetti: assign(() => ({
@@ -133,7 +136,39 @@ export const parkingGameMachine = setup({
 
     skipTime: assign(() => ({
       isTimeSkipped: true
-    }))
+    })),
+
+    setDuration1Hour: assign({ parkedHours: 1, lastEnding: 'mysterious' }),
+    setDuration2Hours: assign({ parkedHours: 2, lastEnding: 'blackhole' }),
+    setDuration3Hours: assign({ parkedHours: 3, lastEnding: 'dance' }),
+    setDuration4Hours: assign({ parkedHours: 4, lastEnding: 'remix' }),
+    
+    calculateFee: assign(({ context }) => ({
+      parkingFee: (context.parkedHours || 1) * 60 // $60 per hour
+    })),
+
+    updateTransitionText: assign(({ context }) => {
+      let intro = "";
+      switch(context.lastEnding) {
+        case 'mysterious':
+          intro = "[PROTAGONIST]: 意識逐漸清晰... 頭好痛。\n[PROTAGONIST]: 剛剛那個穿斗篷的人是誰？這一切都太不真實了。\n[PROTAGONIST]: 看了看手錶，時間好像過了一小時... 算了，應該可以離開了。";
+          break;
+        case 'blackhole':
+          intro = "[PROTAGONIST]: 咳... 咳... 我還活著？\n[PROTAGONIST]: 我剛剛是真的被一隻貓吸進黑洞了嗎？這什麼爛設定？\n[PROTAGONIST]: 感覺像是做了一場兩小時的惡夢。先離開這裡再說。";
+          break;
+        case 'dance':
+          intro = "[PROTAGONIST]: 呼... 呼... 累死我了...\n[PROTAGONIST]: 為什麼吃了地上的義大利麵會不由自主地跳三個小時的舞？\n[PROTAGONIST]: 這遊戲的物理引擎和邏輯絕對壞掉了。腿好痠...";
+          break;
+        case 'remix':
+          intro = "[PROTAGONIST]: ..................\n[PROTAGONIST]: 貓咪... 義大利麵... 旋轉... 混音...\n[PROTAGONIST]: 我的大腦在顫抖。這個世界已經沒有邏輯可言了。毀滅吧，趕緊累了。";
+          break;
+        default:
+          intro = "[PROTAGONIST]: ...發生了什麼？";
+      }
+      return {
+        currentText: `${intro}\n\n[UNKNOWN VOICE]: （廣播聲）「親愛的用戶，感謝您的體驗。請記得繳費才能離場。」\n[PROTAGONIST]: ......行吧，繳費就繳費。`
+      };
+    })
   },
 
   guards: {
@@ -175,43 +210,64 @@ export const parkingGameMachine = setup({
     boundaryVisits: 0,
     isTimeSkipped: false,
     currentState: 'intro1',
-    userEmail: ''
+    userEmail: '',
+    parkedHours: 0,
+    parkingFee: 0,
+    lastEnding: null
   },
 
   states: {
     intro1: {
       entry: [
         { type: 'updateState', params: 'intro1' },
-        { type: 'updateCurrentText', params: '2025年12月24日，平安夜。你還在公司獨自加班，改著永遠改不完的 Bug...' },
+        { type: 'updateCurrentText', params: '[DATE]: 2025年10月14日, 週二\n[TIME]: 23:48\n[LOCATION]: 臥室\n\n又是平凡的一天。你剛結束了疲憊的工作，只想在《歐洲卡車模擬器 2》裡找點平靜。\n你熟練地戴上耳機，方向盤傳來熟悉的觸感。這次的任務很簡單：從柏林運送一批電子零件到華沙。\n高速公路 A12 上下著小雨，車窗上的雨刷有節奏地擺動著。收音機裡播放著深夜的 Lo-Fi 音樂，一切都令人安心。' },
         { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
-        { type: 'addLog', params: { type: 'narrative', text: '🏢 加班夜' } }
+        { type: 'addLog', params: { type: 'narrative', text: '🎮 啟動歐卡2' } }
       ],
       on: { NEXT: 'intro2' }
     },
     intro2: {
       entry: [
         { type: 'updateState', params: 'intro2' },
-        { type: 'updateCurrentText', params: '突然，你的螢幕發出一陣刺眼的白光，將你整個人吞沒！' },
-        { type: 'updateScene', params: { background: 'white', character: 'narrator' } },
-        { type: 'addLog', params: { type: 'system', text: '⚡ 傳送啟動' } }
+        { type: 'updateCurrentText', params: '直到你的 GPS 導航螢幕閃爍了一下。\n\n[SYSTEM]: 正在重新計算路徑...\n[PROTAGONIST]: 「奇怪，我沒走錯路啊？」\n\n你看向螢幕，原本的路線導引變成了一串紅色的亂碼。\n緊接著，遊戲裡的「天空」貼圖開始剝落，露出了背後漆黑的網格。\n耳機裡的 Lo-Fi 音樂變成了尖銳的雜訊聲，方向盤的力回饋突然瘋狂震動，彷彿有什麼東西抓住了輪胎。' },
+        { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
+        { type: 'addLog', params: { type: 'system', text: '⚠️ 系統異常' } }
       ],
       on: { NEXT: 'intro3' }
     },
     intro3: {
       entry: [
         { type: 'updateState', params: 'intro3' },
-        { type: 'updateCurrentText', params: '「這裡是哪裡？這不是辦公室...」你發現自己身處一個充滿科技感的異世界停車場。' },
-        { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
-        { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達異世界' } }
+        { type: 'updateCurrentText', params: '[SYSTEM]: 錯誤。錯誤。偵測到未授權的驅動程式。\n[SYSTEM]: 正在強制同步實體...\n\n你下意識地想按 Alt+F4，但你的手穿過了鍵盤——不，是鍵盤融化成了綠色的數據流，順著你的指尖向上蔓延。\n視線陷入一片黑暗，最後聽到的聲音，是電腦主機發出的、如同引擎過熱般的轟鳴聲...' },
+        { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
+        { type: 'addLog', params: { type: 'system', text: '⚡ 強制傳送' } }
       ],
-      on: { NEXT: 'intro4' }
+      on: { NEXT: 'introStory1' }
     },
-    intro4: {
+    introStory1: {
       entry: [
-        { type: 'updateState', params: 'intro4' },
-        { type: 'updateCurrentText', params: '「那裡有一輛車...看起來能動。」你走向那輛熟悉的智能車。' },
+        { type: 'updateState', params: 'introStory1' },
+        { type: 'updateCurrentText', params: '再次睜開眼時，雨聲依舊，但這裡不是華沙，也不是你的臥室。\n\n> 初始化現實介面... 完成。\n> 載入遊戲: Euro Truck Simulator 2\n> 任務: 長途運輸 | 漢堡 -> 巴黎\n> 狀態: 精神疲勞，定速巡航中 (90 km/h)\n\n[PROTAGONIST]: 只是想跑個長途單放鬆一下...' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
-        { type: 'addLog', params: { type: 'action', text: '👀 發現車輛' } }
+        { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (1/3)' } }
+      ],
+      on: { NEXT: 'introStory2' }
+    },
+    introStory2: {
+      entry: [
+        { type: 'updateState', params: 'introStory2' },
+        { type: 'updateCurrentText', params: '[PROTAGONIST]: 等等，為什麼幀數(FPS)突然掉到 0 了？\n\n> 警告: 顯卡溫度異常\n> 警告: 記憶體溢出 (Memory Overflow)\n> 系統錯誤: 偵測到外部維度干涉\n\n[PROTAGONIST]: 螢幕... 螢幕裂開了？不，是空間裂開了？' },
+        { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
+        { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (2/3)' } }
+      ],
+      on: { NEXT: 'introStory3' }
+    },
+    introStory3: {
+      entry: [
+        { type: 'updateState', params: 'introStory3' },
+        { type: 'updateCurrentText', params: '> 啟動緊急傳送協議...\n> 目標座標: 未知數據庫 // 賽博空間_停車場\n> 載入資產: 智能車輛 [Car_Model_X]\n> 覆蓋玩家意識... \n\n[SYSTEM]: 傳送完成。歡迎來到「裏世界」。' },
+        { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
+        { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (3/3)' } }
       ],
       on: { NEXT: 'inCar' }
     },
@@ -219,7 +275,7 @@ export const parkingGameMachine = setup({
     inCar: {
       entry: [
         { type: 'updateState', params: 'inCar' },
-        { type: 'updateCurrentText', params: '你坐在駕駛座上。引擎是冷的。距離：{{distance}} 公分' },
+        { type: 'updateCurrentText', params: '[PROTAGONIST]: 「等等，我明早還要上班啊！我的全勤獎金——」\n\n你的聲音被數位的風暴淹沒。\n當你的意識恢復時，手裡握著的不再是塑膠方向盤，而是真皮與金屬的冰冷觸感。\n這絕對不是歐洲卡車模擬器。這畫面太真實了，顯卡燃燒都跑不動的那種真實。\n\n你坐在駕駛座上。引擎是冷的。距離：{{distance}} 公分' },
         { type: 'updateScene', params: { background: 'car-interior', character: 'driver' } },
         { type: 'addLog', params: { type: 'narrative', text: '🚗 進入車輛' } }
       ],
@@ -385,7 +441,10 @@ export const parkingGameMachine = setup({
         { type: 'addLog', params: { type: 'event', text: '🌌 觸發結局：黑洞貓' } }
       ],
       after: {
-        7000: 'outsideCar'
+        7000: {
+          target: 'transitionToPayment',
+          actions: ['setDuration2Hours']
+        }
       }
     },
 
@@ -398,7 +457,10 @@ export const parkingGameMachine = setup({
         { type: 'addLog', params: { type: 'event', text: '💃 觸發結局：義大利麵之舞' } }
       ],
       after: {
-        29000: 'outsideCar'
+        29000: {
+          target: 'transitionToPayment',
+          actions: ['setDuration3Hours']
+        }
       }
     },
 
@@ -411,7 +473,10 @@ export const parkingGameMachine = setup({
         { type: 'addLog', params: { type: 'event', text: '🎧 觸發結局：OIIA REMIX' } }
       ],
       after: {
-        12000: 'outsideCar'
+        12000: {
+          target: 'transitionToPayment',
+          actions: ['setDuration4Hours']
+        }
       }
     },
 
@@ -438,28 +503,34 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'mysteriousEvent' },
         'skipTime',
-        { type: 'updateCurrentText', params: '[MYSTERIOUS]: "你來得太早了，旅人。"\n\n[PROTAGONIST]: 誰？你是誰？\n\n[MYSTERIOUS]: "這裡還不是你該來的地方。讓我幫你一把..."\n\n[ACTION]: 神秘人揮了揮手，周圍的景象開始扭曲。\n\n[SYSTEM]: 時間跳躍 +2 小時。異常現象已清除。' },
+        { type: 'updateCurrentText', params: '[MYSTERIOUS]: "你來得太早了，旅人。"\n\n[PROTAGONIST]: 誰？你是誰？\n\n[MYSTERIOUS]: "這裡還不是你該來的地方。讓我幫你一把..."\n\n[ACTION]: 神秘人揮了揮手，周圍的景象開始扭曲。\n\n[SYSTEM]: 時間跳躍 +1 小時。異常現象已清除。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'mysterious' } },
         { type: 'addLog', params: { type: 'event', text: '🔮 觸發神秘事件：時間跳躍' } }
       ],
       on: {
-        GO_PAY: 'outsideCar'
+        GO_PAY: {
+          target: 'transitionToPayment',
+          actions: ['setDuration1Hour']
+        }
       }
+    },
+
+    transitionToPayment: {
+      entry: [
+        { type: 'updateState', params: 'transitionToPayment' }
+      ],
+      always: 'outsideCar'
     },
 
     outsideCar: {
       entry: [
         { type: 'updateState', params: 'outsideCar' },
-        { type: 'updateCurrentText', params: '你走出車外。空氣很清新。你現在安全了。' },
-        { type: 'updateScene', params: { background: 'parking-lot', character: 'narrator' } },
+        'updateTransitionText',
+        { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🚶 離開車輛' } }
       ],
       on: {
-        PAY: 'inputEmail',
-        RESTART: {
-          target: 'intro1',
-          actions: ['resetGame']
-        }
+        PAY: 'inputEmail'
       }
     },
 
@@ -499,7 +570,15 @@ export const parkingGameMachine = setup({
             { type: 'addLog', params: { type: 'ntp', text: '✅ NTP Sync: 2025-12-24 20:45:12.003' } },
             { type: 'addLog', params: { type: 'smtp', text: '📧 SMTP Auth: youarebearpromax@gmail.com' } },
             { type: 'addLog', params: { type: 'smtp', text: '📨 Sending Bill Notification to {{userEmail}}...' } },
-            assign({ notification: { title: '停車繳費通知', body: '您有一筆待繳停車費 $120。請儘速繳納。' } })
+            assign(({ context }) => {
+              const fee = (context.parkedHours || 1) * 60;
+              return {
+                notification: { 
+                  title: '停車繳費通知', 
+                  body: `您有一筆待繳停車費 $${fee}。請儘速繳納。` 
+                }
+              };
+            })
           ]
         }
       }
@@ -508,7 +587,8 @@ export const parkingGameMachine = setup({
     paymentInfo: {
       entry: [
         { type: 'updateState', params: 'paymentInfo' },
-        { type: 'updateCurrentText', params: '停車時間：2小時。費用：$120。繳費通知已發送至您的信箱。' },
+        'calculateFee',
+        { type: 'updateCurrentText', params: '停車時間：{{parkedHours}}小時。費用：${{parkingFee}}。繳費通知已發送至您的信箱。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'system' } }
       ],
       invoke: {
@@ -516,7 +596,7 @@ export const parkingGameMachine = setup({
         input: ({ context }) => ({
           to: context.userEmail,
           subject: '停車繳費通知',
-          text: '您有一筆待繳停車費 $120。請儘速繳納。'
+          text: `您有一筆待繳停車費 $${(context.parkedHours || 1) * 60}。請儘速繳納。`
         })
       },
       on: {
@@ -530,7 +610,15 @@ export const parkingGameMachine = setup({
         { type: 'updateCurrentText', params: '繳費成功！收據已發送。感謝您的使用。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'system' } },
         { type: 'addLog', params: { type: 'smtp', text: '📨 Sending Receipt to {{userEmail}}' } },
-        assign({ notification: { title: '繳費成功通知', body: '您的停車費 $120 已繳納成功。電子發票號碼：AB-12345678' } }),
+        assign(({ context }) => {
+          const fee = (context.parkedHours || 1) * 60;
+          return {
+            notification: { 
+              title: '繳費成功通知', 
+              body: `您的停車費 $${fee} 已繳納成功。電子發票號碼：AB-12345678` 
+            }
+          };
+        }),
         { type: 'addLog', params: { type: 'success', text: '💰 Transaction Verified' } }
       ],
       invoke: {
@@ -538,7 +626,7 @@ export const parkingGameMachine = setup({
         input: ({ context }) => ({
           to: context.userEmail,
           subject: '繳費成功通知',
-          text: '您的停車費 $120 已繳納成功。電子發票號碼：AB-12345678'
+          text: `您的停車費 $${(context.parkedHours || 1) * 60} 已繳納成功。電子發票號碼：AB-12345678`
         })
       },
       on: {

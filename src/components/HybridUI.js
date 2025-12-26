@@ -6,10 +6,11 @@ import { getArrowSymbol } from '../gameMachine';
 // Images are loaded from public/assets/
 const carImg = "/assets/car.png";
 const movingCarImg = "/assets/moving_car.png";
+const parkingLotImg = "/assets/parking_lot.png"; // New Asset
 const oiiaCatImg = "/assets/oiia_cat.png";
 const spaghettiImg = "/assets/spaghetti.png";
 const handTouchingImg = "/assets/hand_touching.png";
-const mysteriousImg = "/assets/mysterious_person.jpg";
+const mysteriousImg = "/assets/mysterious.png"; // Verified as .png
 const oiiaCatGif = "/assets/oiia-cat.gif";
 const oiiaSoundFile = "/assets/OIIAOIIA_CAT_SOUND.mp3";
 const spaghettiVideo = "/assets/SPAGHETTI_DANCE.mp4";
@@ -265,12 +266,18 @@ export const SceneDisplay = ({ background, character, gameState }) => {
   // Determine which image to show based on game state
   const getSceneImage = () => {
     switch (gameState) {
+      case 'DRIVING':
       case 'driving':
         return movingCarImg;
+      
+      case 'ATGATE':
       case 'atGate':
         return railingClosedImg;
+      
+      case 'ATGATE_OPEN':
       case 'gateOpening':
         return railingOpenImg;
+
       case 'endingBlackhole':
         return oiiaCatGif;
       case 'outcomeCat':
@@ -282,14 +289,24 @@ export const SceneDisplay = ({ background, character, gameState }) => {
         return spaghettiImg;
       case 'outcomeBoundary':
         return handTouchingImg;
+      
+      case 'MYSTERIOUS_EVENT':
       case 'mysteriousEvent':
         return mysteriousImg;
+
+      case 'INTRO4':
       case 'intro4':
+      case 'IDLE':
+      case 'parked':
+      case 'POST_DRIVE_CHOICE':
+      case 'postDriveChoice':
+      case 'transitionToPayment':
+        return parkingLotImg;
+
       case 'inCar':
       case 'engineStall':
-      case 'parked':
-      case 'postDriveChoice':
-        return carImg;
+        return carImg; // Interior view
+
       case 'intro1':
       case 'intro2':
       case 'intro3':
