@@ -557,8 +557,8 @@ function App() {
               <div className="w-full h-full relative">
                 {/* --- STAGE 1: INVESTIGATE (Layout: Absolute Pinning) --- */}
                 {(choiceStep === 'INVESTIGATE' || !choiceStep) && (
-                  <div className="w-full h-full animate-in fade-in duration-500">
-                    {/* 1. TEXT: Pinned to Top-Left */}
+                  <div className="w-full h-full relative animate-in fade-in duration-500">
+                    {/* 1. 文字層：絕對定位在上方 (pinned to top) */}
                     <div className="absolute top-0 left-0 w-full p-10 text-left z-10">
                       <TypewriterText 
                         text={`[主角]: 下車了。但這裡感覺... 有點不太對勁。\n[系統]: 車輛已停妥。周圍環境似乎發生了變化。`}
@@ -566,16 +566,16 @@ function App() {
                         speed={30}
                       />
                     </div>
-                    {/* 2. BUTTON: Pinned to Bottom-Center, bg-transparent, 紅框紅字 */}
-                    <div className="absolute bottom-24 left-0 w-full flex justify-center z-10">
+                    {/* 2. 按鈕層：絕對定位在底部 (pinned to bottom)，無視文字高度 */}
+                    <div 
+                      className="choice-menu-overlay absolute bottom-0 w-full opacity-100 translate-y-0 pointer-events-auto z-50 flex justify-center pb-10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button 
                         onClick={() => setChoiceStep('DECIDE')}
-                        style={{ background: 'transparent' }}
-                        className="group relative px-24 py-4 border border-red-500 text-red-500 text-xl font-bold tracking-widest bg-transparent hover:bg-red-500/10 hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all duration-300 rounded-sm"
+                        className="holo-btn"
                       >
-                        <span className="group-hover:scale-105 inline-block transition-transform">
-                          [ 環顧四周 ]
-                        </span>
+                        [ 環顧四周 ]
                       </button>
                     </div>
                   </div>
