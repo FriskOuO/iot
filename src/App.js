@@ -669,7 +669,7 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               {currentState === 'paymentInput' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '80%', maxWidth: '500px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '90%', maxWidth: '600px' }}>
                   <div style={{ color: 'var(--accent-primary)', fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
                     // ENTER CREDENTIALS:
                   </div>
@@ -691,7 +691,7 @@ function App() {
                     }}
                     onClick={(e) => e.stopPropagation()}
                   />
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
                     <button
                       className="holo-btn"
                       onClick={(e) => {
