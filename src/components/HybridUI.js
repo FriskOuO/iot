@@ -187,25 +187,32 @@ export const RetroDialogueBox = ({ text, characterName, actor, onComplete, chara
 /**
  * Scene Display Component
  */
-export const SceneDisplay = ({ background, character, gameState, onTutorialComplete }) => {
+export const SceneDisplay = ({ background, character, gameState, onTutorialComplete, onVideoComplete }) => {
   const backgroundClass = `scene-display scene-${background}`;
   const spaghettiVideoRef = useRef(null);
   const [chaosElements, setChaosElements] = useState([]);
 
   // Generate Chaos Elements for Remix Ending
   useEffect(() => {
-    if (gameState === 'endingRemix') {
-      const elements = Array.from({ length: 50 }).map((_, i) => ({
-        id: i,
-        src: Math.random() > 0.3 ? oiiaCatGif : spaghettiImg, // 70% GIF
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        scale: 0.2 + Math.random() * 2.8, // 0.2 - 3.0
-        duration: 0.5 + Math.random() * 0.5, // 0.5s - 1.0s
-        delay: Math.random() * 2,
-        direction: Math.random() > 0.5 ? 'normal' : 'reverse',
-        zIndex: Math.floor(Math.random() * 10)
-      }));
+    if (gameState === 'endingCatChaos') {
+      const elements = Array.from({ length: 50 }).map((_, i) => {
+        const r = Math.random();
+        let src = oiiaCatGif;
+        if (r > 0.66) src = spaghettiImg;
+        else if (r > 0.33) src = "/assets/protagonist.png";
+
+        return {
+          id: i,
+          src: src,
+          top: Math.random() * 100,
+          left: Math.random() * 100,
+          scale: 0.2 + Math.random() * 2.8, // 0.2 - 3.0
+          duration: 0.5 + Math.random() * 0.5, // 0.5s - 1.0s
+          delay: Math.random() * 2,
+          direction: Math.random() > 0.5 ? 'normal' : 'reverse',
+          zIndex: Math.floor(Math.random() * 10)
+        };
+      });
       setChaosElements(elements);
     } else {
       setChaosElements([]);
@@ -244,15 +251,15 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
 
   // Video Volume Control for Spaghetti Dance
   useEffect(() => {
-    if (gameState === 'endingDance' && spaghettiVideoRef.current) {
-      spaghettiVideoRef.current.volume = 0.5;
+    if (gameState === 'endingSpaghettiDance' && spaghettiVideoRef.current) {
+      spaghettiVideoRef.current.volume = 0.25;
       spaghettiVideoRef.current.play().catch(e => console.error("Video play failed", e));
     }
   }, [gameState]);
 
   // Audio Effect for Remix Ending
   useEffect(() => {
-    if (gameState === 'endingRemix') {
+    if (gameState === 'endingCatChaos') {
       const audio = new Audio(spaghettiOiiaSound);
       audio.volume = 0.5; // Set to 50%
       audio.play().catch(e => console.error("Audio play failed", e));
@@ -260,6 +267,26 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       return () => {
         audio.pause();
         audio.currentTime = 0;
+      };
+    }
+  }, [gameState]);
+
+  // Audio Effect for Black Hole Ending (Cat Sound)
+  useEffect(() => {
+    if (gameState === 'endingBlackHole') {
+      const audio = new Audio(oiiaSoundFile);
+      audio.volume = 0.5;
+      audio.currentTime = 0; // Start at 0s
+      audio.play().catch(e => console.error("Audio play failed", e));
+
+      // Stop after 6 seconds (playing from 0s to 6s)
+      const timer = setTimeout(() => {
+        audio.pause();
+      }, 6000);
+
+      return () => {
+        audio.pause();
+        clearTimeout(timer);
       };
     }
   }, [gameState]);
@@ -279,6 +306,28 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       case 'gateOpening':
         return railingOpenImg;
 
+      // New Endings & Interactions
+      case 'endingBlackHole':
+        return oiiaCatGif;
+      case 'endingSpaghettiDance':
+        return spaghettiImg;
+      case 'endingAdmin':
+        return mysteriousImg;
+      case 'endingCatChaos':
+        return oiiaCatGif;
+      case 'endingBSOD':
+        return parkingLotImg;
+      case 'interactCat':
+        return oiiaCatImg;
+      case 'interactSpaghetti':
+        return spaghettiImg;
+      case 'interactExit':
+        return railingClosedImg;
+      case 'payment':
+      case 'finished':
+        return parkingLotImg;
+
+      // Legacy / Other
       case 'endingBlackhole':
         return oiiaCatGif;
       case 'outcomeCat':
@@ -301,6 +350,11 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       case 'parked':
       case 'POST_DRIVE_CHOICE':
       case 'postDriveChoice':
+      case 'readyToEnter':
+      case 'endingA':
+      case 'endingB':
+      case 'endingC':
+      case 'endingD':
       case 'transitionToPayment':
         return parkingLotImg;
 
@@ -322,16 +376,21 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
   // Determine CSS classes for animation
   const getAnimationClass = () => {
     if (gameState === 'driving') return "driving-rumble";
+    if (gameState === 'endingBlackHole') return "spin-implode";
     if (gameState === 'endingBlackhole') return "spin-implode";
+    if (gameState === 'endingSpaghettiDance') return "dance-shake";
     if (gameState === 'endingDance') return "dance-shake";
+    if (gameState === 'endingCatChaos') return "spin-implode";
     if (gameState === 'endingRemix') return "spin-implode"; // Main center image spins too
+    if (gameState === 'endingC') return "spin-implode"; // Chaos ending
+    if (gameState === 'endingB') return "glitch-shake"; // Backrooms ending
     return "scene-floating-effect";
   };
 
   return (
     <div className={backgroundClass} style={{ position: 'relative', overflow: 'hidden', width: '100%', height: '100%' }}>
       {/* Chaos Background Layer */}
-      {gameState === 'endingRemix' && chaosElements.map(el => (
+      {gameState === 'endingCatChaos' && chaosElements.map(el => (
         <img
           key={el.id}
           src={el.src}
@@ -354,11 +413,17 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       ))}
 
       <div className="character-sprite" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', zIndex: 20 }}>
-        {gameState === 'endingDance' ? (
+        {gameState === 'endingSpaghettiDance' ? (
           <video 
             ref={spaghettiVideoRef}
             src={spaghettiVideo} 
             autoPlay 
+            onTimeUpdate={(e) => {
+              if (e.target.currentTime >= 29) {
+                e.target.pause();
+                onVideoComplete();
+              }
+            }}
             className="w-full h-full object-cover"
             style={{ 
               width: '100%', 

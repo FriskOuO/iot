@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect, useRef } from 'react';
 import { useMachine } from '@xstate/react';
 import './components/CyberpunkUI.css'; // New Cyberpunk Styles
 import './components/StoryMode.css'; // Story Mode Styles
-import { parkingGameMachine } from './gameMachine';
+import { visualNovelMachine } from './visualNovelMachine';
 import { SceneDisplay } from './components/HybridUI'; // Reuse SceneDisplay for now
 import CyberpunkDashboard from './components/CyberpunkDashboard';
 import VirtualMobile from './components/VirtualMobile';
@@ -132,14 +132,59 @@ const TypewriterText = ({ text, context, onComplete, forceShowFull, isDrivingAct
   );
 };
 
+// Neon Button Base (Black bg, glow effect)
+const NEON_BTN_BASE = "group relative h-48 flex flex-col items-center justify-center border-2 bg-black/80 backdrop-blur-md rounded-xl transition-all duration-300 shadow-lg hover:scale-[1.02]";
+
+// Red Alert Button (Transparent bg, Red border, Bottom centered) - MATCHES REFERENCE IMAGE
+const RED_ALERT_BTN = "px-24 py-5 border border-red-500 text-red-500 text-xl font-bold tracking-[0.2em] bg-transparent hover:bg-red-900/20 hover:shadow-[0_0_40px_rgba(220,38,38,0.5)] transition-all duration-500 rounded-sm cursor-pointer z-50";
+
+// Helper for inline styles
+const choiceBtnStyle = (color) => ({
+    height: '140px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    border: `2px solid ${color}80`, // 50% opacity
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    boxShadow: `0 0 10px ${color}33`, // 20% opacity
+    backdropFilter: 'blur(4px)'
+});
+
+// Helper for generic button styles (Subsequent choices)
+const genericBtnStyle = (color) => ({
+    flex: 1,
+    height: '100px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    border: `1px solid ${color}80`,
+    color: color,
+    fontFamily: 'monospace',
+    fontSize: '1.1rem',
+    letterSpacing: '0.1em',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    boxShadow: `0 0 10px ${color}20`,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    position: 'relative',
+    overflow: 'hidden'
+});
+
 function App() {
-  const [state, send, actor] = useMachine(parkingGameMachine);
+  const [state, send, actor] = useMachine(visualNovelMachine);
   const [typingComplete, setTypingComplete] = useState(false);
   const [areOptionsVisible, setAreOptionsVisible] = useState(false); // New Cinematic State
   const [showIgnitionUI, setShowIgnitionUI] = useState(false); // Specific state for Ignition Phase B
   const [startPhase, setStartPhase] = useState(0); // 3-Stage State for Ignition
   const [choiceStep, setChoiceStep] = useState('TEXT'); // Split View State for Choice Phase
   const [forceShowFull, setForceShowFull] = useState(false);
+  const [prevText, setPrevText] = useState(''); // Track previous text for immediate reset
   const [email, setEmail] = useState('');
   const [drivingDistance, setDrivingDistance] = useState(500); // Lifted state for driving
   const messagesEndRef = useRef(null);
@@ -152,46 +197,56 @@ function App() {
   const currentState = state.value;
   const context = state.context;
 
+  // IMMEDIATE STATE RESET PATTERN
+  // Detects text change during render to prevent "flash of completed text"
+  if (context.currentText !== prevText) {
+    setPrevText(context.currentText);
+    setForceShowFull(false);
+    setTypingComplete(false);
+    setAreOptionsVisible(false);
+  }
+
   // State Name Mapping for Localization
   const stateNameMapping = {
-    'intro1': '初始載入',
-    'intro2': '系統異常',
-    'intro3': '強制傳送',
-    'introStory1': '異世界 (1/3)',
-    'introStory2': '異世界 (2/3)',
-    'introStory3': '異世界 (3/3)',
-    'tutorialIntro': '新手引導模式',
+    'start': '異世界轉生',
     'inCar': '車內待命',
     'qteSequence': '引擎啟動',
     'engineStall': '啟動失敗',
     'driving': '駕駛中',
     'atGate': '抵達閘門',
     'gateOpening': '閘門開啟',
-    'parked': '停車完成',
-    'postDriveChoice': '行動選擇',
-    'outcomeCat': '結局：貓',
-    'outcomeSpaghetti': '結局：義大利麵',
-    'outcomeBoundary': '結局：邊界',
-    'mysteriousEvent': '異常事件',
-    'transitionToPayment': '前往繳費',
-    'outsideCar': '離場結算',
-    'paymentInfo': '繳費資訊',
-    'paymentSuccess': '繳費成功',
-    'endingBlackhole': '結局：黑洞',
-    'endingDance': '結局：舞力全開',
-    'endingRemix': '結局：Remix'
+    'parked': '停車場中心',
+    'interactCat': '迷因貓',
+    'interactSpaghetti': '義大利麵',
+    'interactExit': '地圖邊界',
+    'endingBlackHole': '結局：黑洞',
+    'endingCatChaos': '結局：迷因大亂鬥',
+    'endingSpaghettiDance': '結局：舞力全開',
+    'endingAdmin': '結局：管理員',
+    'endingBSOD': '結局：藍屏',
+    'paymentNarrative': '繳費中心',
+    'paymentInput': '輸入資料',
+    'finished': '遊戲結束'
   };
 
 
 
   // Use Custom Hook for Driving Mechanic
-  const { 
-    drivingTimeLeft, 
-    drivingMaxDuration, 
-    drivingStrikes, 
-    isDrivingActive, 
-    handleDriveInput 
-  } = useDrivingMechanic(currentState, send);
+  // const { 
+  //   drivingTimeLeft, 
+  //   drivingMaxDuration, 
+  //   drivingStrikes, 
+  //   isDrivingActive, 
+  //   handleDriveInput 
+  // } = useDrivingMechanic(currentState, send);
+  const isDrivingActive = currentState === 'driving'; // Simplified for UI logic
+
+  // Sync manual driving distance to machine context
+  useEffect(() => {
+    if (currentState === 'driving') {
+      send({ type: 'UPDATE_DISTANCE', distance: drivingDistance });
+    }
+  }, [drivingDistance, currentState, send]);
 
   // Reset driving distance when entering driving state
   useEffect(() => {
@@ -205,6 +260,8 @@ function App() {
     }
   }, [currentState]);
 
+  // (Removed useEffect for text reset as it is now handled by immediate state derivation above)
+
   // Auto-trigger gate when distance reaches 0
   useEffect(() => {
     if (currentState === 'driving' && drivingDistance <= 0) {
@@ -215,6 +272,13 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [currentState, drivingDistance, send]);
+
+  // Force Reset for Choice Phase (Absolute Positioning Fix)
+  useEffect(() => {
+    if (currentState === 'postDriveChoice') {
+        setChoiceStep('INVESTIGATE');
+    }
+  }, [currentState]);
 
   // Reset typing state when text changes
   useEffect(() => {
@@ -262,64 +326,68 @@ function App() {
   // --- CHOICE_PHASE 狀態初始化 ---
   useEffect(() => {
     if (currentState === 'postDriveChoice') {
-      setChoiceStep('INVESTIGATE');
+      setChoiceStep('DECIDE');
     }
   }, [currentState]);
 
   // Get available choices
   const getChoices = () => {
     switch (currentState) {
-      case 'intro1': 
-      case 'introStory1':
-      case 'introStory2':
-      case 'introStory3':
-      case 'tutorialIntro':
-        return [{ label: '繼續', action: 'NEXT' }];
-      case 'intro2': return [{ label: '發生什麼事了？', action: 'NEXT' }];
-      case 'intro3': return [{ label: '四處看看', action: 'NEXT' }];
-      case 'intro4': return [{ label: '走向車輛', action: 'NEXT' }];
-      case 'inCar': return [{ label: '啟動引擎 (QTE)', action: 'NEXT' }];
+      case 'start': return [{ label: '強行進入(物理)', action: 'NEXT' }];
+      case 'inCar': 
+        const inCarChoices = [{ label: '啟動引擎', action: 'NEXT' }];
+        if (context.gameCleared) {
+            inCarChoices.push({ label: '🤖 自動駕駛 (VIP)', action: 'AUTO_PILOT' });
+        }
+        inCarChoices.push({ label: '原地發呆', action: 'DO_NOTHING' });
+        return inCarChoices;
+      case 'qteSequence': return []; // Handled by keyboard
       case 'engineStall': return [{ label: '再試一次', action: 'RETRY' }];
-      case 'atGate': return []; // Auto-advance, no button needed
-      case 'gateOpening': return [{ label: '停車', action: 'PARK' }];
-      case 'parked': return [{ label: '[ 斷開連結 // 離開車輛 ]', action: 'EXIT_CAR' }];
-      case 'postDriveChoice': 
-        if (context.isTimeSkipped) {
-          return [{ label: '前往繳費', action: 'GO_PAY' }];
-        }
-        return [
-          { label: '調查奇怪的貓咪', action: 'CHOOSE_CAT' },
-          { label: '查看地上的義大利麵', action: 'CHOOSE_SPAGHETTI' },
-          { label: '走向出口離開', action: 'CHOOSE_BOUNDARY' }
-        ];
-      case 'outcomeCat':
-        const catChoices = [
-          { label: '摸摸貓咪', action: 'PET_CAT' },
-          { label: '回到停車場', action: 'BACK' }
-        ];
+      case 'driving': return []; // Handled by simulation
+      case 'atGate': return []; // Auto-trigger
+      case 'gateOpening': return []; // Auto-trigger
+      
+      case 'parked': return [
+        { label: '🐱 查看貓咪', action: 'GO_CAT' },
+        { label: '🍝 查看義大利麵', action: 'GO_SPAGHETTI' },
+        { label: '🧱 走向邊界', action: 'GO_EXIT' }
+      ];
+
+      case 'interactCat': 
+        const catChoices = [{ label: '✋ 摸摸貓咪', action: 'TOUCH_CAT' }];
         if (context.hasSpaghetti) {
-          catChoices.unshift({ label: '餵貓吃義大利麵', action: 'FEED_CAT' });
+            catChoices.push({ label: '🍝 餵食義大利麵', action: 'FEED_CAT' });
         }
+        catChoices.push({ label: '🔙 回到停車場', action: 'BACK' });
         return catChoices;
-      case 'outcomeSpaghetti':
-        return [
-          { label: '吃掉它', action: 'EAT_SPAGHETTI' },
-          { label: '拿走它', action: 'TAKE_SPAGHETTI' },
-          { label: '回到停車場', action: 'BACK' }
-        ];
-      case 'outcomeBoundary':
-        return [{ label: '回到停車場', action: 'BACK' }];
-      case 'mysteriousEvent':
-        return [{ label: '前往繳費', action: 'GO_PAY' }];
-      case 'transitionToPayment':
-        return [{ label: '前往繳費選項', action: 'NEXT' }];
-      case 'endingBlackhole':
-      case 'endingDance':
-      case 'endingRemix':
-        return []; // Auto-transition
-      case 'outsideCar': return [{ label: '繳費', action: 'PAY' }];
-      case 'paymentInfo': return [{ label: '確認付款', action: 'CONFIRM_PAY' }];
-      case 'paymentSuccess': return [{ label: '結束遊戲', action: 'RESTART' }];
+
+      case 'interactSpaghetti':
+        const spagChoices = [];
+        if (!context.hasSpaghetti) {
+            spagChoices.push({ label: '🍴 吃掉它', action: 'EAT_SPAGHETTI' });
+            spagChoices.push({ label: '🎒 拿起義大利麵', action: 'PICK_UP' });
+        }
+        spagChoices.push({ label: '🔙 回到停車場', action: 'BACK' });
+        return spagChoices;
+
+      case 'interactExit': return [
+        { label: '💥 撞擊牆壁', action: 'HIT_WALL' },
+        { label: '🔙 回到停車場', action: 'BACK' }
+      ];
+
+      case 'endingBlackHole':
+      case 'endingCatChaos':
+      case 'endingSpaghettiDance':
+      case 'endingAdmin':
+        return [{ label: '前往繳費', action: 'NEXT' }];
+
+      case 'endingBSOD':
+      case 'finished':
+        return [{ label: '再來一把', action: 'RESTART' }];
+        
+      case 'paymentNarrative': return []; // Handled by Proceed Button
+      case 'paymentInput': return []; // Handled by Email Input UI
+
       default: return [];
     }
   };
@@ -366,6 +434,7 @@ function App() {
             character={context.characterImage}
             gameState={currentState}
             onTutorialComplete={() => send({ type: 'NEXT' })}
+            onVideoComplete={() => send({ type: 'VIDEO_COMPLETE' })}
           />
           <div className="scene-overlay"></div>
         </div>
@@ -381,13 +450,22 @@ function App() {
             </div>
           </div>
 
-          <div className="dialogue-text" style={{ whiteSpace: 'pre-wrap', display: 'flex', flexDirection: 'column', gap: '10px', height: '100%' }}>
+          <div className="dialogue-text" style={{ 
+            whiteSpace: 'pre-wrap', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '10px', 
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto', 
+            paddingRight: '10px'
+          }}>
             
 
 
             {/* Standard Unified Rendering for ALL Narrative States */}
             {/* VIEW 1: Narrative (Phase 0 & 1 ONLY) */}
-            {!(currentState === 'qteSequence' && startPhase === 2) && currentState !== 'postDriveChoice' && (
+            {!(currentState === 'qteSequence' && startPhase === 2) && currentState !== 'paymentInput' && (
               <div className="w-full animate-in fade-in duration-500">
                 <TypewriterText 
                   text={context.currentText} 
@@ -422,14 +500,33 @@ function App() {
               </div>
             )}
             
+            {/* VIEW 3: Choice Phase (Inside Terminal) - REMOVED */}
+            
             {currentState === 'driving' && (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <ManualDrivingConsole 
-                  distance={drivingDistance}
-                  onDistanceChange={setDrivingDistance}
-                  onCrash={() => send({ type: 'GAME_OVER' })} 
-                  onFinish={() => { /* Handled by useEffect now */ }}
-                />
+                {state.context.isAutoPilot ? (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '100%',
+                    color: '#22d3ee',
+                    fontFamily: 'monospace',
+                    gap: '1rem'
+                  }}>
+                    <div className="animate-pulse" style={{ fontSize: '3rem' }}>🤖</div>
+                    <div style={{ fontSize: '1.5rem', letterSpacing: '0.2em' }}>AUTO PILOT ENGAGED</div>
+                    <div style={{ fontSize: '0.9rem', opacity: 0.7 }}>SIT BACK AND RELAX</div>
+                  </div>
+                ) : (
+                  <ManualDrivingConsole 
+                    distance={drivingDistance}
+                    onDistanceChange={setDrivingDistance}
+                    onCrash={() => send({ type: 'GAME_OVER' })} 
+                    onFinish={() => { /* Handled by useEffect now */ }}
+                  />
+                )}
               </div>
             )}
             
@@ -552,81 +649,26 @@ function App() {
               </div>
             )}
 
-            {/* VIEW 3: Choice Phase (New Horizontal Layout) */}
-            {currentState === 'postDriveChoice' && (
-              <div className="w-full h-full relative">
-                {/* --- STAGE 1: INVESTIGATE (Layout: Absolute Pinning) --- */}
-                {(choiceStep === 'INVESTIGATE' || !choiceStep) && (
-                  <div className="w-full h-full relative animate-in fade-in duration-500">
-                    {/* 1. 文字層：絕對定位在上方 (pinned to top) */}
-                    <div className="absolute top-0 left-0 w-full p-10 text-left z-10">
-                      <TypewriterText 
-                        text={`[主角]: 下車了。但這裡感覺... 有點不太對勁。\n[系統]: 車輛已停妥。周圍環境似乎發生了變化。`}
-                        context={context}
-                        speed={30}
-                      />
-                    </div>
-                    {/* 2. 按鈕層：絕對定位在底部 (pinned to bottom)，無視文字高度 */}
-                    <div 
-                      className="choice-menu-overlay absolute bottom-0 w-full opacity-100 translate-y-0 pointer-events-auto z-50 flex justify-center pb-10"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button 
-                        onClick={() => setChoiceStep('DECIDE')}
-                        className="holo-btn"
-                      >
-                        [ 環顧四周 ]
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {/* --- STAGE 2: DECIDE (Neon Grid - Preserved) --- */}
-                {choiceStep === 'DECIDE' && (
-                  <div className="w-full h-full flex flex-col items-center justify-center animate-in zoom-in-95 duration-500 gap-8">
-                    <div className="text-cyan-400/80 font-mono text-sm tracking-widest mb-4">
-                      // 偵測到可互動目標 //
-                    </div>
-                    <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8 p-4">
-                      {/* Option 1: Cat */}
-                      <button 
-                        onClick={() => send({ type: 'CHOOSE_CAT' })}
-                        className="group relative h-48 flex flex-col items-center justify-center border-2 border-purple-500/50 bg-black/80 rounded-xl hover:bg-purple-900/20 hover:border-purple-400 hover:scale-105 transition-all shadow-lg"
-                      >
-                        <div className="text-4xl mb-4 group-hover:animate-bounce">🐱</div>
-                        <span className="text-purple-300 font-bold text-lg tracking-widest">調查奇怪的貓咪</span>
-                      </button>
-                      {/* Option 2: Pasta */}
-                      <button 
-                        onClick={() => send({ type: 'CHOOSE_SPAGHETTI' })}
-                        className="group relative h-48 flex flex-col items-center justify-center border-2 border-yellow-500/50 bg-black/80 rounded-xl hover:bg-yellow-900/20 hover:border-yellow-400 hover:scale-105 transition-all shadow-lg"
-                      >
-                        <div className="text-4xl mb-4 group-hover:rotate-12 transition-transform">🍝</div>
-                        <span className="text-yellow-300 font-bold text-lg tracking-widest">查看地上的義大利麵</span>
-                      </button>
-                      {/* Option 3: Exit */}
-                      <button 
-                        onClick={() => send({ type: 'CHOOSE_BOUNDARY' })}
-                        className="group relative h-48 flex flex-col items-center justify-center border-2 border-red-500/50 bg-black/80 rounded-xl hover:bg-red-900/20 hover:border-red-400 hover:scale-105 transition-all shadow-lg"
-                      >
-                        <div className="text-4xl mb-4 group-hover:translate-x-2 transition-transform">🚪</div>
-                        <span className="text-red-300 font-bold text-lg tracking-widest">走向出口離開</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Centralized Choice Menu Overlay */}
-          {(!isGenericContinue && (choices.length > 0 || currentState === 'inputEmail') && currentState !== 'driving' && currentState !== 'postDriveChoice') && (
+      {/* ------------------------------------------------------------------------------------ */}
+          {/* Centralized Choice Menu Overlay (Moved Inside) */}
+          {(!isGenericContinue && (choices.length > 0 || currentState === 'paymentInput' || currentState === 'paymentNarrative') && currentState !== 'driving') && (
             <div 
-              className={`choice-menu-overlay transition-all duration-1000 ease-out ${
+              className={`transition-all duration-1000 ease-out ${
                 areOptionsVisible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
               }`} 
+              style={{ 
+                width: '100%', 
+                display: 'flex', 
+                justifyContent: 'center', 
+                gap: '15px',
+                padding: '10px 20px',
+                zIndex: 50,
+                flexShrink: 0,
+                marginTop: 'auto'
+              }}
               onClick={(e) => e.stopPropagation()}
             >
-              {currentState === 'inputEmail' ? (
+              {currentState === 'paymentInput' ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', width: '80%', maxWidth: '500px' }}>
                   <div style={{ color: 'var(--accent-primary)', fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
                     // ENTER CREDENTIALS:
@@ -649,39 +691,86 @@ function App() {
                     }}
                     onClick={(e) => e.stopPropagation()}
                   />
-                  <button
-                    className="holo-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      send({ type: 'SUBMIT_EMAIL', email });
-                    }}
-                    disabled={!email}
-                    style={{ width: '100%' }}
-                  >
-                    CONFIRM UPLOAD
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      className="holo-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        send({ type: 'BACK' });
+                      }}
+                      style={{ flex: 1, opacity: 0.8 }}
+                    >
+                      [ 返回 ]
+                    </button>
+                    <button
+                      className="holo-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        send({ type: 'SUBMIT_EMAIL', email });
+                      }}
+                      disabled={!email}
+                      style={{ flex: 2 }}
+                    >
+                      [ 確認傳送 ]
+                    </button>
+                  </div>
                 </div>
+              ) : currentState === 'paymentNarrative' ? (
+                <button
+                  className="holo-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    send({ type: 'PROCEED_TO_PAY' });
+                  }}
+                  style={{ width: '100%', maxWidth: '300px' }}
+                >
+                  [ 💳 前往繳費 ]
+                </button>
               ) : (
-                choices.map((choice, idx) => (
-                  <button
-                    key={idx}
-                    className="holo-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (choice.action === 'RESTART') {
-                        handleRestart();
-                      } else {
-                        send({ type: choice.action });
-                      }
-                    }}
-                    disabled={!typingComplete && currentState !== 'engineStall'}
-                  >
-                    {choice.label}
-                  </button>
-                ))
+                choices.map((choice, idx) => {
+                  // Determine theme color based on current state or choice label
+                  let themeColor = '#06b6d4'; // Default Cyan
+                  if (currentState.includes('Cat') || choice.label.includes('貓')) themeColor = '#a855f7'; // Purple
+                  else if (currentState.includes('Spaghetti') || currentState.includes('Pasta') || choice.label.includes('麵')) themeColor = '#eab308'; // Yellow
+                  else if (currentState.includes('Boundary') || currentState.includes('Exit') || choice.label.includes('離開')) themeColor = '#ef4444'; // Red
+                  
+                  return (
+                    <button
+                      key={idx}
+                      style={genericBtnStyle(themeColor)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (choice.action === 'RESTART') {
+                          handleRestart();
+                        } else {
+                          send({ type: choice.action });
+                        }
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.borderColor = themeColor;
+                        e.currentTarget.style.boxShadow = `0 0 20px ${themeColor}66`; // 40% opacity
+                        e.currentTarget.style.backgroundColor = `${themeColor}1a`; // 10% opacity
+                        e.currentTarget.style.letterSpacing = '0.2em';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.borderColor = `${themeColor}80`;
+                        e.currentTarget.style.boxShadow = `0 0 10px ${themeColor}20`;
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+                        e.currentTarget.style.letterSpacing = '0.1em';
+                      }}
+                      disabled={!typingComplete && currentState !== 'engineStall'}
+                    >
+                      {choice.label}
+                    </button>
+                  );
+                })
               )}
             </div>
           )}
+      {/* VIEW 3: Choice Phase (REMOVED - Now handled inside dialogue-terminal) */}
+          </div>
         </div>
       </div>
 

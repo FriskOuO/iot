@@ -55,7 +55,7 @@ const ManualDrivingConsole = ({ distance, onDistanceChange, onCrash, onFinish })
       return newVal;
     });
 
-    // 2. Mistakes & Logic
+    // 2. Mistakes & Logic (Consecutive 3 mistakes OR Durability 0)
     setMistakes(prev => {
       const newCount = prev + 1;
       if (newCount >= 3) {
@@ -66,7 +66,6 @@ const ManualDrivingConsole = ({ distance, onDistanceChange, onCrash, onFinish })
           if (onCrash) onCrash();
         }, 1000);
       } else {
-        // 3. FORCE CONTINUE
         setFeedback("TIMEOUT! ENGINE STALL");
         setFeedbackColor('var(--accent-warning)');
         generateNewKey(); // Immediate reset
@@ -83,13 +82,15 @@ const ManualDrivingConsole = ({ distance, onDistanceChange, onCrash, onFinish })
 
     if (inputKey === currentKey) {
       // Success
-      setMistakes(0);
+      setMistakes(0); // Reset consecutive mistakes
       const newDist = Math.max(0, distance - MOVE_DISTANCE);
       onDistanceChange(newDist);
       setFeedback('PERFECT SHIFT');
       setFeedbackColor('var(--accent-success)');
       
       if (newDist <= 0) {
+        // Ensure we hit exactly 0 or less to trigger finish
+        onDistanceChange(0); 
         onFinish();
         setIsActive(false);
       } else {
