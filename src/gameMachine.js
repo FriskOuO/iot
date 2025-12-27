@@ -91,9 +91,9 @@ export const parkingGameMachine = setup({
       qteProgress: context.qteProgress + 1
     })),
 
-    startEngine: assign(() => ({
+    startEngine: assign(({ context }) => ({
       engineRunning: true,
-      distance: 500
+      distance: (context.distance > 0 && context.distance < 500) ? context.distance : 500
     })),
 
     decreaseDistance: assign(({ context }) => ({
@@ -151,22 +151,22 @@ export const parkingGameMachine = setup({
       let intro = "";
       switch(context.lastEnding) {
         case 'mysterious':
-          intro = "[PROTAGONIST]: 意識逐漸清晰... 頭好痛。\n[PROTAGONIST]: 剛剛那個穿斗篷的人是誰？這一切都太不真實了。\n[PROTAGONIST]: 看了看手錶，時間好像過了一小時... 算了，應該可以離開了。";
+          intro = "[主角]: 意識逐漸清晰... 頭好痛。\n[主角]: 剛剛那個穿斗篷的人是誰？這一切都太不真實了。\n[主角]: 看了看手錶，時間好像過了一小時... 算了，應該可以離開了。";
           break;
         case 'blackhole':
-          intro = "[PROTAGONIST]: 咳... 咳... 我還活著？\n[PROTAGONIST]: 我剛剛是真的被一隻貓吸進黑洞了嗎？這什麼爛設定？\n[PROTAGONIST]: 感覺像是做了一場兩小時的惡夢。先離開這裡再說。";
+          intro = "[主角]: 咳... 咳... 我還活著？\n[主角]: 我剛剛是真的被一隻貓吸進黑洞了嗎？這什麼爛設定？\n[主角]: 感覺像是做了一場兩小時的惡夢。先離開這裡再說。";
           break;
         case 'dance':
-          intro = "[PROTAGONIST]: 呼... 呼... 累死我了...\n[PROTAGONIST]: 為什麼吃了地上的義大利麵會不由自主地跳三個小時的舞？\n[PROTAGONIST]: 這遊戲的物理引擎和邏輯絕對壞掉了。腿好痠...";
+          intro = "[主角]: 呼... 呼... 累死我了...\n[主角]: 為什麼吃了地上的義大利麵會不由自主地跳三個小時的舞？\n[主角]: 這遊戲的物理引擎和邏輯絕對壞掉了。腿好痠...";
           break;
         case 'remix':
-          intro = "[PROTAGONIST]: ..................\n[PROTAGONIST]: 貓咪... 義大利麵... 旋轉... 混音...\n[PROTAGONIST]: 我的大腦在顫抖。這個世界已經沒有邏輯可言了。毀滅吧，趕緊累了。";
+          intro = "[主角]: ..................\n[主角]: 貓咪... 義大利麵... 旋轉... 混音...\n[主角]: 我的大腦在顫抖。這個世界已經沒有邏輯可言了。毀滅吧，趕緊累了。";
           break;
         default:
-          intro = "[PROTAGONIST]: ...發生了什麼？";
+          intro = "[主角]: ...發生了什麼？";
       }
       return {
-        currentText: `${intro}\n\n[UNKNOWN VOICE]: （廣播聲）「親愛的用戶，感謝您的體驗。請記得繳費才能離場。」\n[PROTAGONIST]: ......行吧，繳費就繳費。`
+        currentText: `${intro}\n\n[未知聲音]: （廣播聲）「親愛的用戶，感謝您的體驗。請記得繳費才能離場。」\n[主角]: ......行吧，繳費就繳費。`
       };
     })
   },
@@ -220,7 +220,7 @@ export const parkingGameMachine = setup({
     intro1: {
       entry: [
         { type: 'updateState', params: 'intro1' },
-        { type: 'updateCurrentText', params: '[DATE]: 2025年10月14日, 週二\n[TIME]: 23:48\n[LOCATION]: 臥室\n\n又是平凡的一天。你剛結束了疲憊的工作，只想在《歐洲卡車模擬器 2》裡找點平靜。\n你熟練地戴上耳機，方向盤傳來熟悉的觸感。這次的任務很簡單：從柏林運送一批電子零件到華沙。\n高速公路 A12 上下著小雨，車窗上的雨刷有節奏地擺動著。收音機裡播放著深夜的 Lo-Fi 音樂，一切都令人安心。' },
+        { type: 'updateCurrentText', params: '[日期]: 2025年10月14日, 週二\n[時間]: 23:48\n[地點]: 臥室\n\n又是平凡的一天。你剛結束了疲憊的工作，只想在《歐洲卡車模擬器 2》裡找點平靜。\n你熟練地戴上耳機，方向盤傳來熟悉的觸感。這次的任務很簡單：從柏林運送一批電子零件到華沙。\n高速公路 A12 上下著小雨，車窗上的雨刷有節奏地擺動著。收音機裡播放著深夜的 Lo-Fi 音樂，一切都令人安心。' },
         { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
         { type: 'addLog', params: { type: 'narrative', text: '🎮 啟動歐卡2' } }
       ],
@@ -229,7 +229,7 @@ export const parkingGameMachine = setup({
     intro2: {
       entry: [
         { type: 'updateState', params: 'intro2' },
-        { type: 'updateCurrentText', params: '直到你的 GPS 導航螢幕閃爍了一下。\n\n[SYSTEM]: 正在重新計算路徑...\n[PROTAGONIST]: 「奇怪，我沒走錯路啊？」\n\n你看向螢幕，原本的路線導引變成了一串紅色的亂碼。\n緊接著，遊戲裡的「天空」貼圖開始剝落，露出了背後漆黑的網格。\n耳機裡的 Lo-Fi 音樂變成了尖銳的雜訊聲，方向盤的力回饋突然瘋狂震動，彷彿有什麼東西抓住了輪胎。' },
+        { type: 'updateCurrentText', params: '直到你的 GPS 導航螢幕閃爍了一下。\n\n[系統]: 正在重新計算路徑...\n[主角]: 「奇怪，我沒走錯路啊？」\n\n你看向螢幕，原本的路線導引變成了一串紅色的亂碼。\n緊接著，遊戲裡的「天空」貼圖開始剝落，露出了背後漆黑的網格。\n耳機裡的 Lo-Fi 音樂變成了尖銳的雜訊聲，方向盤的力回饋突然瘋狂震動，彷彿有什麼東西抓住了輪胎。' },
         { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
         { type: 'addLog', params: { type: 'system', text: '⚠️ 系統異常' } }
       ],
@@ -238,7 +238,7 @@ export const parkingGameMachine = setup({
     intro3: {
       entry: [
         { type: 'updateState', params: 'intro3' },
-        { type: 'updateCurrentText', params: '[SYSTEM]: 錯誤。錯誤。偵測到未授權的驅動程式。\n[SYSTEM]: 正在強制同步實體...\n\n你下意識地想按 Alt+F4，但你的手穿過了鍵盤——不，是鍵盤融化成了綠色的數據流，順著你的指尖向上蔓延。\n視線陷入一片黑暗，最後聽到的聲音，是電腦主機發出的、如同引擎過熱般的轟鳴聲...' },
+        { type: 'updateCurrentText', params: '[系統]: 錯誤。錯誤。偵測到未授權的驅動程式。\n[系統]: 正在強制同步實體...\n\n你下意識地想按 Alt+F4，但你的手穿過了鍵盤——不，是鍵盤融化成了綠色的數據流，順著你的指尖向上蔓延。\n視線陷入一片黑暗，最後聽到的聲音，是電腦主機發出的、如同引擎過熱般的轟鳴聲...' },
         { type: 'updateScene', params: { background: 'black', character: 'narrator' } },
         { type: 'addLog', params: { type: 'system', text: '⚡ 強制傳送' } }
       ],
@@ -247,7 +247,7 @@ export const parkingGameMachine = setup({
     introStory1: {
       entry: [
         { type: 'updateState', params: 'introStory1' },
-        { type: 'updateCurrentText', params: '再次睜開眼時，雨聲依舊，但這裡不是華沙，也不是你的臥室。\n\n> 初始化現實介面... 完成。\n> 載入遊戲: Euro Truck Simulator 2\n> 任務: 長途運輸 | 漢堡 -> 巴黎\n> 狀態: 精神疲勞，定速巡航中 (90 km/h)\n\n[PROTAGONIST]: 只是想跑個長途單放鬆一下...' },
+        { type: 'updateCurrentText', params: '再次睜開眼時，雨聲依舊，但這裡不是華沙，也不是你的臥室。\n\n> 初始化現實介面... 完成。\n> 載入遊戲: Euro Truck Simulator 2\n> 任務: 長途運輸 | 漢堡 -> 巴黎\n> 狀態: 精神疲勞，定速巡航中 (90 km/h)\n\n[主角]: 只是想跑個長途單放鬆一下...' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (1/3)' } }
       ],
@@ -256,7 +256,7 @@ export const parkingGameMachine = setup({
     introStory2: {
       entry: [
         { type: 'updateState', params: 'introStory2' },
-        { type: 'updateCurrentText', params: '[PROTAGONIST]: 等等，為什麼幀數(FPS)突然掉到 0 了？\n\n> 警告: 顯卡溫度異常\n> 警告: 記憶體溢出 (Memory Overflow)\n> 系統錯誤: 偵測到外部維度干涉\n\n[PROTAGONIST]: 螢幕... 螢幕裂開了？不，是空間裂開了？' },
+        { type: 'updateCurrentText', params: '[主角]: 等等，為什麼幀數(FPS)突然掉到 0 了？\n\n> 警告: 顯卡溫度異常\n> 警告: 記憶體溢出 (Memory Overflow)\n> 系統錯誤: 偵測到外部維度干涉\n\n[主角]: 螢幕... 螢幕裂開了？不，是空間裂開了？' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (2/3)' } }
       ],
@@ -265,7 +265,7 @@ export const parkingGameMachine = setup({
     introStory3: {
       entry: [
         { type: 'updateState', params: 'introStory3' },
-        { type: 'updateCurrentText', params: '> 啟動緊急傳送協議...\n> 目標座標: 未知數據庫 // 賽博空間_停車場\n> 載入資產: 智能車輛 [Car_Model_X]\n> 覆蓋玩家意識... \n\n[SYSTEM]: 傳送完成。歡迎來到「裏世界」。' },
+        { type: 'updateCurrentText', params: '> 啟動緊急傳送協議...\n> 目標座標: 未知數據庫 // 賽博空間_停車場\n> 載入資產: 智能車輛 [Car_Model_X]\n> 覆蓋玩家意識... \n\n[系統]: 傳送完成。歡迎來到「裏世界」。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🌍 抵達裏世界 (3/3)' } }
       ],
@@ -275,7 +275,7 @@ export const parkingGameMachine = setup({
     tutorialIntro: {
       entry: [
         { type: 'updateState', params: 'tutorialIntro' },
-        { type: 'updateCurrentText', params: '[SYSTEM]: 生物特徵掃描完成...\n[CAR AI]: 警告：資料庫中未找到您的駕駛執照紀錄。\n[CAR AI]: 根據安全協議，強制啟動「新手引導模式」。\n[CAR AI]: 系統偵測到外部輸入裝置。請參閱上方圖示熟悉操作配置。\n[CAR AI]: 確認完畢後，請點擊畫面解除安全鎖定。' },
+        { type: 'updateCurrentText', params: '[系統]: 生物特徵掃描完成...\n\n[車載智能]: 警告：資料庫中未找到您的駕駛執照紀錄。\n\n[車載智能]: 根據安全協議，強制啟動「新手引導模式」。\n\n[車載智能]: 系統偵測到外部輸入裝置。請參閱上方圖示熟悉操作配置。\n\n[車載智能]: 確認完畢後，請點擊畫面解除安全鎖定。' },
         { type: 'updateScene', params: { background: 'car-interior', character: 'system' } },
         { type: 'addLog', params: { type: 'system', text: '🔰 啟動新手引導' } }
       ],
@@ -287,7 +287,7 @@ export const parkingGameMachine = setup({
     inCar: {
       entry: [
         { type: 'updateState', params: 'inCar' },
-        { type: 'updateCurrentText', params: '[PROTAGONIST]: 「等等，我明早還要上班啊！我的全勤獎金——」\n\n你的聲音被數位的風暴淹沒。\n當你的意識恢復時，手裡握著的不再是塑膠方向盤，而是真皮與金屬的冰冷觸感。\n這絕對不是歐洲卡車模擬器。這畫面太真實了，顯卡燃燒都跑不動的那種真實。\n\n你坐在駕駛座上。引擎是冷的。距離：{{distance}} 公分' },
+        { type: 'updateCurrentText', params: '[主角]: 「等等，我明早還要上班啊！我的全勤獎金——」\n\n你的聲音被數位的風暴淹沒。\n當你的意識恢復時，手裡握著的不再是塑膠方向盤，而是真皮與金屬的冰冷觸感。\n這絕對不是歐洲卡車模擬器。這畫面太真實了，顯卡燃燒都跑不動的那種真實。\n\n你坐在駕駛座上。引擎是冷的。距離：{{distance}} 公分' },
         { type: 'updateScene', params: { background: 'car-interior', character: 'driver' } },
         { type: 'addLog', params: { type: 'narrative', text: '🚗 進入車輛' } }
       ],
@@ -302,7 +302,7 @@ export const parkingGameMachine = setup({
     qteSequence: {
       entry: [
         { type: 'updateState', params: 'qteSequence' },
-        { type: 'updateCurrentText', params: '⚡ 引擎啟動挑戰！依照順序按下方向鍵！' },
+        { type: 'updateCurrentText', params: '[車載智能]: 點火系統準備就緒。等待手動同步...\n>>> 請依照 HUD 指示輸入點火序列 <<<' },
         { type: 'addLog', params: { type: 'qte', text: '🎯 QTE 挑戰開始' } }
       ],
       on: {
@@ -332,7 +332,7 @@ export const parkingGameMachine = setup({
     engineStall: {
       entry: [
         { type: 'updateState', params: 'engineStall' },
-        { type: 'updateCurrentText', params: '引擎咳嗽了一聲後熄火了。再試一次。' },
+        { type: 'updateCurrentText', params: '[警告]: 操作失誤過多，引擎強制熄火。請重新啟動。' },
         { type: 'addLog', params: { type: 'fail', text: '💀 引擎熄火' } }
       ],
       on: {
@@ -359,7 +359,7 @@ export const parkingGameMachine = setup({
     atGate: {
       entry: [
         { type: 'updateState', params: 'atGate' },
-        { type: 'updateCurrentText', params: '[SYSTEM]: 感測器偵測到車輛。柵欄升起中...\n\n[PROTAGONIST]: 顯示屏上閃爍著入場時間... 我得記住這個時間，出去時可能需要繳費。' },
+        { type: 'updateCurrentText', params: '[系統]: 感測器偵測到車輛。柵欄升起中...\n\n[主角]: 顯示屏上閃爍著入場時間... 我得記住這個時間，出去時可能需要繳費。' },
         { type: 'updateScene', params: { background: 'gate', character: 'system' } },
         { type: 'addLog', params: { type: 'sensor', text: '📏 距離：0 公分 (TARGET REACHED)' } },
         { type: 'addLog', params: { type: 'info', text: '🕒 入場時間：23:50:00' } }
@@ -384,7 +384,7 @@ export const parkingGameMachine = setup({
     parked: {
       entry: [
         { type: 'updateState', params: 'parked' },
-        { type: 'updateCurrentText', params: '成功！你已經停好了智能車。任務完成。' },
+        { type: 'updateCurrentText', params: '[系統]: 座標校正完畢。車輛已停妥。\n[系統]: 電子手煞車... 鎖定。液壓懸吊... 洩壓完畢。\n[聲音]: (引擎運轉聲逐漸消失，只剩下冷卻風扇的微弱嗡鳴)\n[車載智能]: 動力系統已切斷。感謝您的駕駛。\n[車載智能]: 車門已解鎖。祝您夜晚愉快。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'narrator' } },
         { type: 'addLog', params: { type: 'success', text: '🎉 任務完成！' } },
         { type: 'addLog', params: { type: 'sql', text: '💾 SQL INSERT → parking_records' } }
@@ -401,7 +401,7 @@ export const parkingGameMachine = setup({
     postDriveChoice: {
       entry: [
         { type: 'updateState', params: 'postDriveChoice' },
-        { type: 'updateCurrentText', params: '[SYSTEM]: 車輛已停妥。請選擇接下來的行動。\n\n[PROTAGONIST]: 下車了。但這裡感覺... 有點不太對勁。' },
+        { type: 'updateCurrentText', params: '[系統]: 車輛已停妥。請選擇接下來的行動。\n\n[主角]: 下車了。但這裡感覺... 有點不太對勁。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'protagonist' } },
         { type: 'addLog', params: { type: 'narrative', text: '🤔 遭遇異常選擇' } }
       ],
@@ -416,7 +416,7 @@ export const parkingGameMachine = setup({
     outcomeCat: {
       entry: [
         { type: 'updateState', params: 'outcomeCat' },
-        { type: 'updateCurrentText', params: '[PROTAGONIST]: 這裡有一隻貓咪... 牠在不停地旋轉？而且還發出奇怪的 "OIIAI" 聲音...\n\n[ACTION]: 你試著靠近。\n\n[PROTAGONIST]: 牠注意到我了。貓咪停止了旋轉，直勾勾地盯著我看。' },
+        { type: 'updateCurrentText', params: '[主角]: 這裡有一隻貓咪... 牠在不停地旋轉？而且還發出奇怪的 "OIIAI" 聲音...\n\n[動作]: 你試著靠近。\n\n[主角]: 牠注意到我了。貓咪停止了旋轉，直勾勾地盯著我看。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'cat' } },
         { type: 'addLog', params: { type: 'narrative', text: '🐱 發現旋轉貓咪' } }
       ],
@@ -430,7 +430,7 @@ export const parkingGameMachine = setup({
     outcomeSpaghetti: {
       entry: [
         { type: 'updateState', params: 'outcomeSpaghetti' },
-        { type: 'updateCurrentText', params: '[PROTAGONIST]: 地上有一盤... 義大利麵？\n\n[PROTAGONIST]: 為什麼空曠的停車場地上會有一盤完好的義大利麵？這太不合理了。' },
+        { type: 'updateCurrentText', params: '[主角]: 地上有一盤... 義大利麵？\n\n[主角]: 為什麼空曠的停車場地上會有一盤完好的義大利麵？這太不合理了。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'spaghetti' } },
         { type: 'addLog', params: { type: 'narrative', text: '🍝 發現義大利麵' } }
       ],
@@ -448,7 +448,7 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'endingBlackhole' },
         'skipTime',
-        { type: 'updateCurrentText', params: '[ACTION]: 你伸出手摸了摸貓咪...\n\n[SOUND]: OIIAI OIIAI OIIAI...\n\n[PROTAGONIST]: 貓咪開始高速旋轉，速度快到產生了殘影！\n\n[SYSTEM]: 警告！偵測到重力奇點！\n\n[PROTAGONIST]: 哇啊啊啊啊被吸進去了——' },
+        { type: 'updateCurrentText', params: '[動作]: 你伸出手摸了摸貓咪...\n\n[聲音]: OIIAI OIIAI OIIAI...\n\n[主角]: 貓咪開始高速旋轉，速度快到產生了殘影！\n\n[系統]: 警告！偵測到重力奇點！\n\n[主角]: 哇啊啊啊啊被吸進去了——' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'cat' } },
         { type: 'addLog', params: { type: 'event', text: '🌌 觸發結局：黑洞貓' } }
       ],
@@ -464,7 +464,7 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'endingDance' },
         'skipTime',
-        { type: 'updateCurrentText', params: '[ACTION]: 你決定吃掉地上的義大利麵。\n\n[PROTAGONIST]: ...？！身體... 身體自己動起來了！\n\n[MUSIC]: ♫ 이빨 사이 낀 spaghetti 빼고 싶니? Bon appétit ♫\n\n[MUSIC]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫\n\n[MUSIC]: ♫ (Ooh) 머릿속 낀 SSERAFIM, bad bitch in between your teeth ♫\n\n[MUSIC]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫' },
+        { type: 'updateCurrentText', params: '[動作]: 你決定吃掉地上的義大利麵。\n\n[主角]: ...？！身體... 身體自己動起來了！\n\n[音樂]: ♫ 이빨 사이 낀 spaghetti 빼고 싶니? Bon appétit ♫\n\n[音樂]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫\n\n[音樂]: ♫ (Ooh) 머릿속 낀 SSERAFIM, bad bitch in between your teeth ♫\n\n[音樂]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'spaghetti' } },
         { type: 'addLog', params: { type: 'event', text: '💃 觸發結局：義大利麵之舞' } }
       ],
@@ -480,7 +480,7 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'endingRemix' },
         'skipTime',
-        { type: 'updateCurrentText', params: '[ACTION]: 你把義大利麵餵給了貓咪。\n\n[PROTAGONIST]: ...？！\n\n[MUSIC]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫\n\n[SOUND]: OIA OIII OIA IIA\n\n[SOUND]: OIA OIII OIA OIOIA' },
+        { type: 'updateCurrentText', params: '[動作]: 你把義大利麵餵給了貓咪。\n\n[主角]: ...？！\n\n[音樂]: ♫ 그냥 포기해 어차피, eat it up, eat it, eat it up ♫\n\n[聲音]: OIA OIII OIA IIA\n\n[聲音]: OIA OIII OIA OIOIA' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'cat' } },
         { type: 'addLog', params: { type: 'event', text: '🎧 觸發結局：OIIA REMIX' } }
       ],
@@ -496,7 +496,7 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'outcomeBoundary' },
         'incrementBoundaryVisits',
-        { type: 'updateCurrentText', params: '[PROTAGONIST]: 不管這些了，先離開這裡再說。我像往常一樣走向出口...\n\n[SOUND]: *砰！*\n\n[PROTAGONIST]: 好痛！我撞到了什麼？前面明明什麼都沒有...\n\n[ACTION]: 你伸出手向前摸索。\n\n[PROTAGONIST]: 這是... 一堵看不見的牆？我摸到了這個空間的「邊界」。' },
+        { type: 'updateCurrentText', params: '[主角]: 不管這些了，先離開這裡再說。我像往常一樣走向出口...\n\n[聲音]: *砰！*\n\n[主角]: 好痛！我撞到了什麼？前面明明什麼都沒有...\n\n[動作]: 你伸出手向前摸索。\n\n[主角]: 這是... 一堵看不見的牆？我摸到了這個空間的「邊界」。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'boundary' } },
         { type: 'addLog', params: { type: 'narrative', text: '🚫 觸碰世界邊界' } }
       ],
@@ -515,7 +515,7 @@ export const parkingGameMachine = setup({
       entry: [
         { type: 'updateState', params: 'mysteriousEvent' },
         'skipTime',
-        { type: 'updateCurrentText', params: '[MYSTERIOUS]: "你來得太早了，旅人。"\n\n[PROTAGONIST]: 誰？你是誰？\n\n[MYSTERIOUS]: "這裡還不是你該來的地方。讓我幫你一把..."\n\n[ACTION]: 神秘人揮了揮手，周圍的景象開始扭曲。\n\n[SYSTEM]: 時間跳躍 +1 小時。異常現象已清除。' },
+        { type: 'updateCurrentText', params: '[神秘人]: "你來得太早了，旅人。"\n\n[主角]: 誰？你是誰？\n\n[神秘人]: "這裡還不是你該來的地方。讓我幫你一把..."\n\n[動作]: 神秘人揮了揮手，周圍的景象開始扭曲。\n\n[系統]: 時間跳躍 +1 小時。異常現象已清除。' },
         { type: 'updateScene', params: { background: 'parking-lot', character: 'mysterious' } },
         { type: 'addLog', params: { type: 'event', text: '🔮 觸發神秘事件：時間跳躍' } }
       ],

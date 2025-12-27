@@ -7,114 +7,123 @@ const KEY_DISPLAY = {
 };
 
 const ManualDrivingConsole = ({ distance, onDistanceChange, onCrash, onFinish }) => {
-  // const [distance, setDistance] = useState(500); // Removed local state
   const [durability, setDurability] = useState(100);
+  const [mistakes, setMistakes] = useState(0);
   const [currentKey, setCurrentKey] = useState(null);
   const [feedback, setFeedback] = useState('WAITING FOR SIGNAL...');
   const [feedbackColor, setFeedbackColor] = useState('var(--accent-primary)');
-  const [timeLeft, setTimeLeft] = useState(100); // Percentage
+  const [timeLeft, setTimeLeft] = useState(100);
   const [isActive, setIsActive] = useState(false);
 
-  const timerRef = useRef(null);
-  const intervalRef = useRef(null);
   const MOVE_DISTANCE = 25;
-  const TIME_LIMIT = 2000; // 2 seconds per key
 
   // Initialize
   useEffect(() => {
-    startRound();
-    return () => cleanup();
-  }, []);
-
-  const cleanup = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-  };
-
-  const startRound = () => {
-    cleanup();
-    
-    if (distance <= 0) {
-      onFinish();
-      return;
-    }
-
-    const nextKey = KEYS[Math.floor(Math.random() * KEYS.length)];
-    setCurrentKey(nextKey);
-    setTimeLeft(100);
+    generateNewKey();
     setIsActive(true);
     setFeedback('PRESS KEY');
     setFeedbackColor('var(--text-main)');
+  }, []);
 
-    // Start Timer (Visual + Logic)
-    const startTime = Date.now();
-    intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, 100 - (elapsed / TIME_LIMIT) * 100);
-      setTimeLeft(remaining);
+  // Timer Logic (Strict Loop)
+  useEffect(() => {
+    if (!isActive) return;
 
-      if (remaining <= 0) {
-        handleTimeout();
-      }
-    }, 50);
+    if (timeLeft > 0) {
+      const timerId = setTimeout(() => {
+        setTimeLeft(prev => prev - 2.5); // 50ms tick, 2000ms total -> 2.5% per tick
+      }, 50);
+      return () => clearTimeout(timerId);
+    } else {
+      handleTimeout();
+    }
+  }, [timeLeft, isActive]);
+
+  const generateNewKey = () => {
+    const nextKey = KEYS[Math.floor(Math.random() * KEYS.length)];
+    setCurrentKey(nextKey);
+    setTimeLeft(100);
   };
 
   const handleTimeout = () => {
-    cleanup();
-    setIsActive(false);
-    applyDamage(20, "TIMEOUT! ENGINE STALL");
-  };
+    // 1. Penalty
+    setDurability(prev => {
+      const newVal = Math.max(0, prev - 20);
+      if (newVal <= 0) {
+        if (onCrash) onCrash();
+      }
+      return newVal;
+    });
 
-  const applyDamage = (amount, msg) => {
-    const newDurability = durability - amount;
-    setDurability(newDurability);
-    setFeedback(msg);
-    setFeedbackColor('var(--accent-warning)');
-
-    // Shake effect or visual cue could go here
-    
-    if (newDurability <= 0) {
-      if (onCrash) onCrash();
-    } else {
-      // Recover after short delay
-      timerRef.current = setTimeout(() => {
-        startRound();
-      }, 1000);
-    }
+    // 2. Mistakes & Logic
+    setMistakes(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 3) {
+        setFeedback("SYSTEM FAILURE: TOO MANY ERRORS");
+        setFeedbackColor('var(--accent-warning)');
+        setIsActive(false);
+        setTimeout(() => {
+          if (onCrash) onCrash();
+        }, 1000);
+      } else {
+        // 3. FORCE CONTINUE
+        setFeedback("TIMEOUT! ENGINE STALL");
+        setFeedbackColor('var(--accent-warning)');
+        generateNewKey(); // Immediate reset
+      }
+      return newCount;
+    });
   };
 
   const handleInput = useCallback((e) => {
     if (!isActive || !currentKey) return;
 
-    // Normalize key input
-    // Arrow keys come as "ArrowUp", letters as "KeyW" or just "w" depending on event
-    // We'll use e.key which is usually "ArrowUp" or "w"
     const inputKey = e.key.length === 1 ? e.key.toUpperCase() : e.key;
-    
-    // Ignore modifier keys
     if (['Shift', 'Control', 'Alt'].includes(inputKey)) return;
 
     if (inputKey === currentKey) {
       // Success
-      cleanup();
+      setMistakes(0);
       const newDist = Math.max(0, distance - MOVE_DISTANCE);
-      onDistanceChange(newDist); // Use prop instead of local state
+      onDistanceChange(newDist);
       setFeedback('PERFECT SHIFT');
       setFeedbackColor('var(--accent-success)');
       
       if (newDist <= 0) {
         onFinish();
+        setIsActive(false);
       } else {
-        // Immediate next round for flow
-        setTimeout(startRound, 100); 
+        generateNewKey(); // Immediate next key
       }
     } else {
       // Wrong Key
-      cleanup();
-      setIsActive(false);
-      applyDamage(10, `WRONG INPUT! (${inputKey})`);
+      setDurability(prev => {
+        const newVal = Math.max(0, prev - 10);
+        if (newVal <= 0) {
+           if (onCrash) onCrash();
+           setIsActive(false);
+        }
+        return newVal;
+      });
+      
+      setMistakes(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) {
+          setFeedback("SYSTEM FAILURE: TOO MANY ERRORS");
+          setFeedbackColor('var(--accent-warning)');
+          setIsActive(false);
+          setTimeout(() => {
+            if (onCrash) onCrash();
+          }, 1000);
+        } else {
+          setFeedback(`WRONG INPUT! (${inputKey})`);
+          setFeedbackColor('var(--accent-warning)');
+          generateNewKey(); // Immediate reset
+        }
+        return newCount;
+      });
     }
-  }, [isActive, currentKey, distance, durability, onFinish, onCrash]);
+  }, [isActive, currentKey, distance, onFinish, onCrash]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleInput);

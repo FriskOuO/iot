@@ -36,13 +36,13 @@ const CyberpunkDashboard = ({ currentState, distance, logs = [] }) => {
   return (
     <div className="dashboard-panel">
       <div className="dashboard-header">
-        SYSTEM MONITOR // v2.0.45
+        // 系統監控面板 // 版本 v2.0.45
       </div>
       
       <div className="dashboard-content">
         {/* System Status */}
         <div className="status-module">
-          <span className="module-label">System Status</span>
+          <span className="module-label">系統狀態</span>
           <div className="module-value" style={{ color: 'var(--accent-primary)' }}>
             {stateLabels[currentState] || currentState}
           </div>
@@ -50,10 +50,10 @@ const CyberpunkDashboard = ({ currentState, distance, logs = [] }) => {
 
         {/* Sensor Data */}
         <div className="status-module">
-          <span className="module-label">HC-SR04 Sensor</span>
+          <span className="module-label">距離感測模組</span>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-            <span className="module-value">{distance} cm</span>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>DISTANCE</span>
+            <span className="module-value">{distance} 公分</span>
+            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>距離</span>
           </div>
           <div className="health-bar-container">
             <div 

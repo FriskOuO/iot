@@ -92,3 +92,104 @@
   pointer-events: none;
   z-index: 10;
 }
+
+/* Utility Classes for Cinematic Fade-In (Tailwind-like) */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-1000 {
+  transition-duration: 1000ms;
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-100 {
+  opacity: 1;
+}
+
+.translate-y-0 {
+  transform: translateY(0);
+}
+
+.translate-y-4 {
+  transform: translateY(1rem);
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.pointer-events-auto {
+  pointer-events: auto;
+}
+
+/* Grid Layout Helpers for Choice Phase */
+.grid-choices {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .grid-choices {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  min-height: 140px;
+  text-align: center;
+}
+
+.choice-card:hover {
+  transform: scale(1.05);
+}
+
+.choice-card .icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.choice-card:hover .icon {
+  transform: scale(1.2);
+}
+
+.choice-card .label {
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+/* Specific Colors */
+.choice-cat { border-color: rgba(168, 85, 247, 0.5); } /* purple */
+.choice-cat:hover { background-color: rgba(88, 28, 135, 0.2); border-color: rgba(192, 132, 252, 1); }
+.choice-cat .label { color: #d8b4fe; }
+
+.choice-pasta { border-color: rgba(234, 179, 8, 0.5); } /* yellow */
+.choice-pasta:hover { background-color: rgba(113, 63, 18, 0.2); border-color: rgba(250, 204, 21, 1); }
+.choice-pasta .label { color: #fde047; }
+
+.choice-exit { border-color: rgba(107, 114, 128, 0.5); } /* gray */
+.choice-exit:hover { background-color: rgba(31, 41, 55, 0.4); border-color: rgba(209, 213, 219, 1); }
+.choice-exit .label { color: #d1d5db; }

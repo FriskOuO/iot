@@ -391,7 +391,7 @@ body {
   background: transparent; 
   z-index: 20;
   gap: 15px;
-  animation: fadeIn 0.3s ease-out;
+  /* animation: fadeIn 0.3s ease-out; Replaced by JS transition */
 }
 
 /* When hovering over ANY button inside the overlay, blur the background */
