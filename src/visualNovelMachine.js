@@ -354,7 +354,7 @@ export const visualNovelMachine = createMachine({
         currentText: ({ context }) => context.hasSpaghetti 
             ? '義大利麵已經被你拿走了，這裡只剩盤子的殘影。' 
             : '一坨熱騰騰的義大利麵漂浮在半空中，看起來很不科學。',
-        characterImage: 'spaghetti',
+        characterImage: ({ context }) => context.hasSpaghetti ? 'spaghetti_eaten' : 'spaghetti',
         logs: ({ context }) => [...context.logs, { type: 'narrative', text: '🍝 發現義大利麵', timestamp: new Date().toISOString() }]
       }),
       on: {
