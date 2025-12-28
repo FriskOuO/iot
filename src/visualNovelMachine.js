@@ -38,6 +38,8 @@ export const visualNovelMachine = createMachine({
     gameCleared: false, // 新增：通關標記 (二周目開啟自動駕駛)
     isAutoPilot: false, // 新增：自動駕駛狀態
     email: '', // 新增：使用者信箱
+    notification: null, // 新增：虛擬手機通知
+    parkedHours: 0, // 新增：停車時數
     logs: [],
     backgroundImage: 'parking-lot',
     characterImage: 'narrator'
@@ -465,6 +467,7 @@ export const visualNovelMachine = createMachine({
     paymentNarrative: {
       entry: assign({
         currentText: ({ context }) => `(一切突然安靜下來) 虛空中傳來一個低沉的神祕聲音：「...鬧夠了嗎？無論你是被黑洞吸走、跳舞還是被管理員抓走... 停車費還是要算的。」\n\n「你總共佔用了 ${context.parkingHours} 小時的伺服器資源。繳費才能離開這個異世界！」`,
+        parkedHours: ({ context }) => context.parkingHours,
         logs: ({ context }) => [...context.logs, { type: 'system', text: `💰 產生帳單: NT$ ${context.parkingHours * 100}`, timestamp: new Date().toISOString() }]
       }),
       on: {
@@ -481,6 +484,10 @@ export const visualNovelMachine = createMachine({
           target: 'sendingEmail',
           actions: assign({
             email: ({ event }) => event.email,
+            notification: ({ context }) => ({
+              title: '停車繳費通知',
+              body: `您有一筆待繳停車費。請儘速繳納。`
+            }),
             logs: ({ context }) => [...context.logs, { type: 'action', text: '📧 準備寄送電子發票...', timestamp: new Date().toISOString() }]
           })
         },
@@ -527,6 +534,10 @@ export const visualNovelMachine = createMachine({
         onDone: {
           target: 'finished',
           actions: assign({
+            notification: ({ context }) => ({
+              title: '繳費成功通知',
+              body: `您的停車費已繳納成功。電子發票已寄出。`
+            }),
             logs: ({ context }) => [...context.logs, { type: 'success', text: '✅ 繳費成功！收據已寄出', timestamp: new Date().toISOString() }]
           })
         },

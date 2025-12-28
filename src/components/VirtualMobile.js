@@ -24,7 +24,7 @@ const VirtualMobile = ({ notification, parkedHours }) => {
   // Calculate Fee First (Before Rendering)
   // Default to 1 hour if 0 or undefined to avoid $0 issues
   const hoursToBill = parkedHours > 0 ? parkedHours : 1; 
-  const finalFee = hoursToBill * 60; // $60 per hour
+  const finalFee = hoursToBill * 100; // $100 per hour
 
   const isPendingPayment = currentNotif.title === '停車繳費通知';
   const isPaymentSuccess = currentNotif.title === '繳費成功通知';
