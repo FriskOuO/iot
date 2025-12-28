@@ -113,6 +113,10 @@
   background: linear-gradient(to bottom, #374151, #1f2937);
 }
 
+.scene-teach {
+  /* Background handled in JS via inline style to support PUBLIC_URL */
+}
+
 .scene-gate {
   background: linear-gradient(to bottom, #7f1d1d, #991b1b);
 }

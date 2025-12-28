@@ -75,6 +75,15 @@ const DialogueBox = ({
 const SceneDisplay = ({ background, character }) => {
   const backgroundClass = `scene-display scene-${background}`;
 
+  // Handle public assets explicitly
+  const style = {};
+  if (background === 'teach') {
+    style.backgroundImage = `url(${process.env.PUBLIC_URL}/assets/teach.png)`;
+    style.backgroundSize = 'cover';
+    style.backgroundPosition = 'center';
+    style.backgroundRepeat = 'no-repeat';
+  }
+
   const characterImages = {
     'narrator': '🎭',
     'driver': '🚗',
@@ -82,7 +91,7 @@ const SceneDisplay = ({ background, character }) => {
   };
 
   return (
-    <div className={backgroundClass}>
+    <div className={backgroundClass} style={style}>
       <div className="character-sprite">
         {characterImages[character] || characterImages['narrator']}
       </div>

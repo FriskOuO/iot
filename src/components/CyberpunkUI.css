@@ -319,7 +319,7 @@ body {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   overflow-y: auto;
-  max-height: 300px;
+  min-height: 200px; /* Ensure minimum visibility */
   display: flex;
   flex-direction: column-reverse; /* Newest at bottom usually, or top depending on pref */
 }

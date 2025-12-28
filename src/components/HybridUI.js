@@ -324,7 +324,7 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       case 'interactSpaghetti':
         return context && context.hasSpaghetti ? spaghettiEatenImg : spaghettiImg;
       case 'interactExit':
-        return railingClosedImg;
+        return handTouchingImg;
       case 'payment':
       case 'finished':
         return parkingLotImg;
@@ -365,6 +365,7 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
         return carImg; // Interior view
 
       case 'tutorialIntro':
+      case 'simpleDrivingMode':
         return teachImg;
 
       case 'intro1':

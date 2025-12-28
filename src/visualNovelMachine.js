@@ -148,8 +148,10 @@ export const visualNovelMachine = createMachine({
       }),
       on: {
         NEXT: {
-          target: 'qteSequence',
-          actions: assign({ qteSequence: generateQTESequence(), qteProgress: 0 })
+          target: 'simpleDrivingMode',
+          actions: assign({
+            logs: ({ context }) => [...context.logs, { type: 'action', text: '👉 啟動引擎', timestamp: new Date().toISOString() }]
+          })
         },
         // 新增：自動駕駛 (二周目限定)
         AUTO_PILOT: {
@@ -165,6 +167,27 @@ export const visualNovelMachine = createMachine({
           actions: assign({
             logs: ({ context }) => [...context.logs, { type: 'action', text: '😴 選擇：原地睡死', timestamp: new Date().toISOString() }]
           })
+        }
+      }
+    },
+
+    // --- 簡易駕駛模式 (教學) ---
+    simpleDrivingMode: {
+      entry: assign({
+        currentText: '系統偵測到駕駛沒有證照，所以開啟簡易駕駛模式',
+        backgroundImage: 'teach',
+        logs: ({ context }) => [...context.logs, { type: 'system', text: '⚠️ No License Detected. Switching to Simple Mode.', timestamp: new Date().toISOString() }]
+      }),
+      invoke: {
+        src: fromCallback(({ sendBack }) => {
+          const timeout = setTimeout(() => sendBack({ type: 'AUTO_TRANSITION' }), 3000);
+          return () => clearTimeout(timeout);
+        })
+      },
+      on: {
+        AUTO_TRANSITION: {
+          target: 'qteSequence',
+          actions: assign({ qteSequence: generateQTESequence(), qteProgress: 0 })
         }
       }
     },
