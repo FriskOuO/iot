@@ -20,9 +20,44 @@ export const useUltrasonicSensor = (actualDistance) => {
     measuredDistance: 0, // cm
     isTriggering: false,
     isEchoing: false,
+    warningLevel: 'safe', // 新增：警示等級
+    warningColor: '#00ff00', // 新增：警示顏色
   });
 
   const [history, setHistory] = useState([]);
+
+  // 根據距離計算警示等級和顏色
+  const calculateWarningLevel = useCallback((distance) => {
+    if (distance <= 30) {
+      return {
+        level: 'danger',
+        color: '#ff0000', // 紅色 - 危險
+        label: '⚠️ 危險',
+        description: '快撞到了！'
+      };
+    } else if (distance <= 80) {
+      return {
+        level: 'warning',
+        color: '#ff8800', // 橙色 - 警告
+        label: '⚡ 注意',
+        description: '越來越近了'
+      };
+    } else if (distance <= 150) {
+      return {
+        level: 'caution',
+        color: '#ffff00', // 黃色 - 小心
+        label: '👀 小心',
+        description: '請注意距離'
+      };
+    } else {
+      return {
+        level: 'safe',
+        color: '#00ff00', // 綠色 - 安全
+        label: '✅ 安全',
+        description: '距離還很遠'
+      };
+    }
+  }, []);
 
   // 添加隨機噪聲，模擬真實感測器的誤差
   const addNoise = useCallback((value) => {
@@ -61,6 +96,10 @@ export const useUltrasonicSensor = (actualDistance) => {
 
       setTimeout(() => {
         const echoEndTime = Date.now();
+        
+        // 計算警示等級
+        const warning = calculateWarningLevel(measuredDistance);
+        
         const newData = {
           triggerTime,
           echoStartTime: triggerTime + 10,
@@ -69,6 +108,10 @@ export const useUltrasonicSensor = (actualDistance) => {
           measuredDistance: Math.round(measuredDistance * 10) / 10, // 保留 1 位小數
           isTriggering: false,
           isEchoing: false,
+          warningLevel: warning.level,
+          warningColor: warning.color,
+          warningLabel: warning.label,
+          warningDescription: warning.description,
         };
 
         setSensorData(newData);
@@ -80,11 +123,12 @@ export const useUltrasonicSensor = (actualDistance) => {
             timestamp: Date.now(),
             distance: newData.measuredDistance,
             duration: newData.duration,
+            warningLevel: warning.level,
           },
         ]);
       }, 50); // 模擬 Echo 訊號返回時間
     }, 10); // Trigger 訊號持續時間
-  }, [actualDistance, addNoise]);
+  }, [actualDistance, addNoise, calculateWarningLevel]);
 
   // 自動測量 (每 100ms 觸發一次，模擬連續測量)
   useEffect(() => {

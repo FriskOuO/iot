@@ -777,7 +777,7 @@ function App() {
       {/* Right Column: Dashboard */}
       <CyberpunkDashboard 
         currentState={currentState}
-        distance={currentState === 'driving' ? drivingDistance : (currentState === 'atGate' ? 0 : context.distance)}
+        distance={currentState === 'driving' ? drivingDistance : context.distance}
         logs={context.logs}
       />
 

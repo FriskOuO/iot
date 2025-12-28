@@ -48,9 +48,12 @@ const IoTDashboard = ({ context, sensorData, coapPacket }) => {
       {
         label: '距離 (cm)',
         data: sensorData.history?.slice(-20).map(d => d.distance) || [],
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: sensorData.warningColor || 'rgb(75, 192, 192)',
+        backgroundColor: sensorData.warningColor ? `${sensorData.warningColor}33` : 'rgba(75, 192, 192, 0.2)',
         tension: 0.1,
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: sensorData.warningColor || 'rgb(75, 192, 192)',
       },
     ],
   };
@@ -92,10 +95,61 @@ const IoTDashboard = ({ context, sensorData, coapPacket }) => {
       {/* 感測器數據面板 */}
       <div className="sensor-panel">
         <h3>🔬 HC-SR04 超聲波感測器</h3>
+        
+        {/* 動態警示顯示 */}
+        <div 
+          className="warning-display"
+          style={{
+            backgroundColor: sensorData.warningColor ? `${sensorData.warningColor}20` : 'transparent',
+            borderColor: sensorData.warningColor || '#00ff00',
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderRadius: '10px',
+            padding: '15px',
+            marginBottom: '15px',
+            textAlign: 'center',
+            transition: 'all 0.3s ease',
+            boxShadow: sensorData.warningColor ? `0 0 20px ${sensorData.warningColor}40` : 'none',
+          }}
+        >
+          <div style={{ 
+            fontSize: '24px', 
+            fontWeight: 'bold', 
+            color: sensorData.warningColor || '#00ff00',
+            marginBottom: '5px',
+          }}>
+            {sensorData.warningLabel || '✅ 安全'}
+          </div>
+          <div style={{ 
+            fontSize: '14px', 
+            color: '#ddd',
+          }}>
+            {sensorData.warningDescription || '距離還很遠'}
+          </div>
+        </div>
+        
         <div className="sensor-data">
-          <div className="data-item">
+          <div 
+            className="data-item"
+            style={{
+              borderLeftColor: sensorData.warningColor || '#00ff00',
+              borderLeftWidth: '4px',
+              borderLeftStyle: 'solid',
+              transition: 'border-color 0.3s ease',
+            }}
+          >
             <span className="label">測量距離:</span>
-            <span className="value">{sensorData.measuredDistance?.toFixed(1) || 0} cm</span>
+            <span 
+              className="value"
+              style={{
+                color: sensorData.warningColor || '#00ff00',
+                fontWeight: 'bold',
+                fontSize: '20px',
+                transition: 'color 0.3s ease',
+              }}
+            >
+              {sensorData.measuredDistance?.toFixed(1) || 0} cm
+            </span>
           </div>
           <div className="data-item">
             <span className="label">Echo 持續時間:</span>
@@ -121,6 +175,69 @@ const IoTDashboard = ({ context, sensorData, coapPacket }) => {
           <strong>計算公式:</strong>
           <code>Distance (cm) = (Duration_μs × 0.0343) / 2</code>
           <p className="formula-note">聲速: 343 m/s @ 20°C</p>
+        </div>
+        
+        {/* 警示等級說明 */}
+        <div className="warning-legend" style={{
+          backgroundColor: '#1a1a2e',
+          padding: '15px',
+          borderRadius: '8px',
+          marginTop: '15px',
+        }}>
+          <h4 style={{ marginTop: 0, marginBottom: '10px', color: '#fff' }}>
+            🚦 距離警示等級
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ 
+                width: '20px', 
+                height: '20px', 
+                backgroundColor: '#00ff00', 
+                borderRadius: '50%',
+                display: 'inline-block'
+              }}></span>
+              <span style={{ color: '#ddd' }}>
+                <strong style={{ color: '#00ff00' }}>安全</strong> - 距離 &gt; 150cm：距離還很遠
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ 
+                width: '20px', 
+                height: '20px', 
+                backgroundColor: '#ffff00', 
+                borderRadius: '50%',
+                display: 'inline-block'
+              }}></span>
+              <span style={{ color: '#ddd' }}>
+                <strong style={{ color: '#ffff00' }}>小心</strong> - 80-150cm：請注意距離
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ 
+                width: '20px', 
+                height: '20px', 
+                backgroundColor: '#ff8800', 
+                borderRadius: '50%',
+                display: 'inline-block'
+              }}></span>
+              <span style={{ color: '#ddd' }}>
+                <strong style={{ color: '#ff8800' }}>注意</strong> - 30-80cm：越來越近了
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ 
+                width: '20px', 
+                height: '20px', 
+                backgroundColor: '#ff0000', 
+                borderRadius: '50%',
+                display: 'inline-block',
+                animation: 'pulse 1s infinite'
+              }}></span>
+              <span style={{ color: '#ddd' }}>
+                <strong style={{ color: '#ff0000' }}>危險</strong> - &lt; 30cm：快撞到了！
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

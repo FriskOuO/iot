@@ -460,3 +460,27 @@ body {
   box-shadow: none;
   opacity: 0.6;
 }
+/* 🚦 動態警示動畫 - 危險脈動效果 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+/* 距離警示等級樣式增強 */
+.status-module {
+  transition: all 0.3s ease;
+}
+
+.health-bar-container {
+  transition: all 0.3s ease;
+}
+
+.health-bar-fill {
+  transition: all 0.3s ease;
+}

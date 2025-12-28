@@ -52,6 +52,7 @@ export const visualNovelMachine = createMachine({
           : '系統載入中... 你站在這充滿迷因氣息的停車場入口。\n正在連接 NTP 伺服器校時...',
         backgroundImage: 'parking-lot',
         // 重置單局變數，但保留 gameCleared
+        distance: 500,
         hasSpaghetti: false,
         wallHitCount: 0,
         failCount: 0,
@@ -272,6 +273,7 @@ export const visualNovelMachine = createMachine({
     atGate: {
       entry: assign({
         currentText: '到達閘門。感測器正在讀取你的靈魂。',
+        distance: 0,
         logs: ({ context }) => [...context.logs, { type: 'system', text: '🔍 Scanning...', timestamp: new Date().toISOString() }]
       }),
       invoke: {
