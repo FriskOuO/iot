@@ -272,7 +272,7 @@ const CyberpunkDashboard = ({ currentState, distance, logs = [] }) => {
           {logs.slice().reverse().map((log, index) => (
             <div key={index} className="log-entry">
               <span className="log-timestamp">
-                [{new Date().toLocaleTimeString('en-US', { hour12: false })}]
+                [{new Date(log.timestamp).toLocaleTimeString('en-US', { hour12: false })}]
               </span>
               <span className={`log-type-${log.type}`}>
                 {log.text}
