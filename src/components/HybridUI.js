@@ -9,6 +9,7 @@ const movingCarImg = "/assets/moving_car.png";
 const parkingLotImg = "/assets/parking_lot.png"; // New Asset
 const oiiaCatImg = "/assets/oiia_cat.png";
 const spaghettiImg = "/assets/spaghetti.png";
+const spaghettiEatenImg = "/assets/spaghetti_eaten.png";
 const handTouchingImg = "/assets/hand_touching.png";
 const mysteriousImg = "/assets/mysterious.png"; // Verified as .png
 const oiiaCatGif = "/assets/oiia-cat.gif";
@@ -18,6 +19,7 @@ const spaghettiOiiaSound = "/assets/SPAGETTI_OIIA.mp3";
 const railingClosedImg = "/assets/railing.png";
 const railingOpenImg = "/assets/railing_opening.png";
 const teachImg = "/assets/teach.png";
+const bsodImg = "/assets/bsod.png";
 
 /**
  * Live Variable Renderer
@@ -187,7 +189,7 @@ export const RetroDialogueBox = ({ text, characterName, actor, onComplete, chara
 /**
  * Scene Display Component
  */
-export const SceneDisplay = ({ background, character, gameState, onTutorialComplete, onVideoComplete }) => {
+export const SceneDisplay = ({ background, character, gameState, onTutorialComplete, onVideoComplete, context }) => {
   const backgroundClass = `scene-display scene-${background}`;
   const spaghettiVideoRef = useRef(null);
   const [chaosElements, setChaosElements] = useState([]);
@@ -316,11 +318,11 @@ export const SceneDisplay = ({ background, character, gameState, onTutorialCompl
       case 'endingCatChaos':
         return oiiaCatGif;
       case 'endingBSOD':
-        return parkingLotImg;
+        return bsodImg;
       case 'interactCat':
         return oiiaCatImg;
       case 'interactSpaghetti':
-        return spaghettiImg;
+        return context && context.hasSpaghetti ? spaghettiEatenImg : spaghettiImg;
       case 'interactExit':
         return railingClosedImg;
       case 'payment':

@@ -435,6 +435,7 @@ function App() {
             gameState={currentState}
             onTutorialComplete={() => send({ type: 'NEXT' })}
             onVideoComplete={() => send({ type: 'VIDEO_COMPLETE' })}
+            context={context}
           />
           <div className="scene-overlay"></div>
         </div>
